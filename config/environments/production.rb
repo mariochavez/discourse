@@ -39,7 +39,7 @@ Discourse::Application.configure do
       :address =>        ENV['SMTP_SERVER'],
       :user_name =>      ENV['MANDRILL_USERNAME'],
       :password =>       ENV['MANDRILL_APIKEY'],
-      :domain               => 'heroku.com',
+      :domain               => 'crowdint.com',
       :authentication       => 'plain'}
 
     # Send deprecation notices to registered listeners
