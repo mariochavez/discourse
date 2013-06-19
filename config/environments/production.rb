@@ -39,9 +39,8 @@ Discourse::Application.configure do
       :address =>        ENV['SMTP_SERVER'],
       :user_name =>      ENV['MANDRILL_USERNAME'],
       :password =>       ENV['MANDRILL_APIKEY'],
-      :domain               => 'crowdint.com',
-      :authentication       => 'plain',
-      :enable_starttls_auto => true  }
+      :domain               => 'heroku.com',
+      :authentication       => 'plain'}
 
     # Send deprecation notices to registered listeners
     config.active_support.deprecation = :notify
