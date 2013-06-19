@@ -81,6 +81,8 @@ gem 'discourse_plugin', path: 'vendor/gems/discourse_plugin'
 gem 'discourse_emoji', path: 'vendor/gems/discourse_emoji'
 # gem 'discourse_task', path: 'vendor/gems/discourse_task'
 
+gem 'newrelic_rpm'
+
 # Gems used only for assets and not required
 # in production environments by default.
 # allow everywhere for now cause we are allowing asset debugging in prd
