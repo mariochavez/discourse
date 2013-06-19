@@ -81,6 +81,7 @@ gem 'discourse_plugin', path: 'vendor/gems/discourse_plugin'
 gem 'discourse_emoji', path: 'vendor/gems/discourse_emoji'
 # gem 'discourse_task', path: 'vendor/gems/discourse_task'
 
+gem 'dalli'
 gem 'newrelic_rpm'
 
 # Gems used only for assets and not required
