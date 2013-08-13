@@ -46,6 +46,19 @@ module PrettyText
 
 
   class Helpers
+
+    def t(key, opts)
+      str = I18n.t("js." + key)
+      if opts
+        # TODO: server localisation has no parity with client
+        # should be fixed
+        opts.each do |k,v|
+          str.gsub!("{{#{k}}}", v)
+        end
+      end
+      str
+    end
+
     # function here are available to v8
     def avatar_template(username)
       return "" unless username
@@ -90,6 +103,7 @@ module PrettyText
 
     @ctx.eval("var Discourse = {}; Discourse.SiteSettings = #{SiteSetting.client_settings_json};")
     @ctx.eval("var window = {}; window.devicePixelRatio = 2;") # hack to make code think stuff is retina
+    @ctx.eval("var I18n = {}; I18n.t = function(a,b){ return helpers.t(a,b); }");
 
     ctx_load( "app/assets/javascripts/discourse/components/bbcode.js",
               "app/assets/javascripts/discourse/components/utilities.js",
@@ -152,17 +166,18 @@ module PrettyText
     return html unless url
 
     image = /\.(jpg|jpeg|gif|png|tiff|tif|bmp)$/
+    relative = /^\/[^\/]/
 
     doc = Nokogiri::HTML.fragment(html)
 
     doc.css("a").each do |l|
       href = l["href"].to_s
-      l["href"] = url + href if href[0] == '/' && href =~ image
+      l["href"] = url + href if href =~ relative && href =~ image
     end
 
     doc.css("img").each do |l|
       src = l["src"].to_s
-      l["src"] = url + src if src[0] == '/'
+      l["src"] = url + src if src =~ relative
     end
 
     doc.to_s
@@ -216,7 +231,7 @@ module PrettyText
     # remove href inside quotes
     doc.css("aside.quote a").each { |l| l["href"] = "" }
     # extract all links from the post
-    doc.css("a").each { |l| links << l["href"] unless l["href"].empty? }
+    doc.css("a").each { |l| links << l["href"] unless l["href"].blank? }
     # extract links to quotes
     doc.css("aside.quote").each do |a|
       topic_id = a['data-topic']

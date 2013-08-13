@@ -3,57 +3,49 @@ require "digest/sha1"
 class OptimizedImage < ActiveRecord::Base
   belongs_to :upload
 
-  def self.create_for(upload, width=nil, height=nil)
+  def self.create_for(upload, width, height)
+    return unless width && height
+
     @image_sorcery_loaded ||= require "image_sorcery"
 
-    original_path = "#{Rails.root}/public#{upload.url}"
+    external_copy = Discourse.store.download(upload) if Discourse.store.external?
+    original_path = if Discourse.store.external?
+      external_copy.path
+    else
+      Discourse.store.path_for(upload)
+    end
+
     # create a temp file with the same extension as the original
-    temp_file = Tempfile.new(["discourse", File.extname(original_path)])
+    temp_file = Tempfile.new(["discourse-thumbnail", File.extname(original_path)])
     temp_path = temp_file.path
 
-    # do the resize when there is both dimensions
-    if width && height && ImageSorcery.new(original_path).convert(temp_path, resize: "#{width}x#{height}")
-      image_info = FastImage.new(temp_path)
-      thumbnail = OptimizedImage.new({
+    if ImageSorcery.new(original_path).convert(temp_path, resize: "#{width}x#{height}")
+      thumbnail = OptimizedImage.create!(
         upload_id: upload.id,
         sha1: Digest::SHA1.file(temp_path).hexdigest,
         extension: File.extname(temp_path),
-        width: image_info.size[0],
-        height: image_info.size[1]
-      })
-      # make sure the directory exists
-      FileUtils.mkdir_p Pathname.new(thumbnail.path).dirname
-      # move the temp file to the right location
-      File.open(thumbnail.path, "wb") do |f|
-        f.write temp_file.read
-      end
+        width: width,
+        height: height,
+        url: "",
+      )
+      # store the optimized image and update its url
+      thumbnail.url = Discourse.store.store_optimized_image(temp_file, thumbnail)
+      thumbnail.save
     end
 
     # close && remove temp file
-    temp_file.close
-    temp_file.unlink
+    temp_file.close!
+    # make sure we remove the cached copy from external stores
+    external_copy.close! if Discourse.store.external?
 
     thumbnail
   end
 
-  def url
-    "#{Upload.base_url}/#{optimized_path}/#{filename}"
-  end
-
-  def path
-    "#{path_root}/#{optimized_path}/#{filename}"
-  end
-
-  def path_root
-    @path_root ||= "#{Rails.root}/public"
-  end
-
-  def optimized_path
-    "uploads/#{RailsMultisite::ConnectionManagement.current_db}/_optimized/#{sha1[0..2]}/#{sha1[3..5]}"
-  end
-
-  def filename
-    "#{sha1[6..16]}_#{width}x#{height}#{extension}"
+  def destroy
+    OptimizedImage.transaction do
+      Discourse.store.remove_file(url)
+      super
+    end
   end
 
 end

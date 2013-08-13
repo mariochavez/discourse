@@ -75,7 +75,7 @@ describe Group do
   end
 
   it "Correctly updates all automatic groups upon request" do
-    admin = Fabricate(:admin)
+    Fabricate(:admin)
     user = Fabricate(:user)
     user.change_trust_level!(:regular)
 
@@ -132,6 +132,12 @@ describe Group do
 
     User.where(id: u1.id).count.should == 1
     GroupUser.count.should == 0
+  end
+
+  it "allows you to lookup a new group by name" do
+    group = Fabricate(:group)
+    group.id.should == Group[group.name].id
+    group.id.should == Group[group.name.to_sym].id
   end
 
 end

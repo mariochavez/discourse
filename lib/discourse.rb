@@ -2,6 +2,9 @@ require 'cache'
 
 module Discourse
 
+  # Expected less matches than what we got in a find
+  class TooManyMatches < Exception; end
+
   # When they try to do something they should be logged in for
   class NotLoggedIn < Exception; end
 
@@ -16,6 +19,33 @@ module Discourse
 
   # When a setting is missing
   class SiteSettingMissing < Exception; end
+
+  # Cross site request forgery
+  class CSRF < Exception; end
+
+  def self.activate_plugins!
+    @plugins = Plugin.find_all("#{Rails.root}/plugins")
+    @plugins.each do |plugin|
+      plugin.activate!
+    end
+  end
+
+  def self.plugins
+    @plugins
+  end
+
+  def self.auth_providers
+    providers = []
+    if plugins
+      plugins.each do |p|
+        next unless p.auth_providers
+        p.auth_providers.each do |prov|
+          providers << prov
+        end
+      end
+    end
+    providers
+  end
 
   def self.cache
     @cache ||= Cache.new
@@ -75,6 +105,8 @@ module Discourse
 
   def self.git_version
     return $git_version if $git_version
+
+    # load the version stamped by the "build:stamp" task
     f = Rails.root.to_s + "/config/version"
     require f if File.exists?("#{f}.rb")
 
@@ -90,6 +122,16 @@ module Discourse
     user = User.where(username_lower: SiteSetting.system_username).first if SiteSetting.system_username.present?
     user = User.admins.order(:id).first if user.blank?
     user
+  end
+
+  def self.store
+    if SiteSetting.enable_s3_uploads?
+      @s3_store_loaded ||= require 'file_store/s3_store'
+      S3Store.new
+    else
+      @local_store_loaded ||= require 'file_store/local_store'
+      LocalStore.new
+    end
   end
 
 private

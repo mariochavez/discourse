@@ -16,22 +16,15 @@ Discourse.LoginController = Discourse.Controller.extend(Discourse.ModalFunctiona
     return Discourse.Site.instance();
   }.property(),
 
-
   /**
    Determines whether at least one login button is enabled
   **/
   hasAtLeastOneLoginButton: function() {
-    return Discourse.SiteSettings.enable_google_logins ||
-           Discourse.SiteSettings.enable_facebook_logins ||
-           Discourse.SiteSettings.enable_cas_logins ||
-           Discourse.SiteSettings.enable_twitter_logins ||
-           Discourse.SiteSettings.enable_yahoo_logins ||
-           Discourse.SiteSettings.enable_github_logins ||
-           Discourse.SiteSettings.enable_persona_logins;
-  }.property(),
+    return Em.get("Discourse.LoginMethod.all").length > 0;
+  }.property("Discourse.LoginMethod.all.@each"),
 
   loginButtonText: function() {
-    return this.get('loggingIn') ? Em.String.i18n('login.logging_in') : Em.String.i18n('login.title');
+    return this.get('loggingIn') ? I18n.t('login.logging_in') : I18n.t('login.title');
   }.property('loggingIn'),
 
   loginDisabled: function() {
@@ -69,71 +62,47 @@ Discourse.LoginController = Discourse.Controller.extend(Discourse.ModalFunctiona
 
     }, function(result) {
       // Failed to login
-      loginController.flash(Em.String.i18n('login.error'), 'error');
+      loginController.flash(I18n.t('login.error'), 'error');
       loginController.set('loggingIn', false);
-    })
+    });
 
     return false;
   },
 
   authMessage: (function() {
     if (this.blank('authenticate')) return "";
-    return Em.String.i18n("login." + (this.get('authenticate')) + ".message");
+    var method = Discourse.get('LoginMethod.all').findProperty("name", this.get("authenticate"));
+    if(method){
+      return method.get('message');
+    }
   }).property('authenticate'),
 
-  twitterLogin: function() {
-    this.set('authenticate', 'twitter');
-    var left = this.get('lastX') - 400;
-    var top = this.get('lastY') - 200;
-    return window.open(Discourse.getURL("/auth/twitter"), "_blank", "menubar=no,status=no,height=400,width=800,left=" + left + ",top=" + top);
-  },
+  externalLogin: function(loginMethod){
+    var name = loginMethod.get("name");
+    var customLogin = loginMethod.get("customLogin");
 
-  facebookLogin: function() {
-    this.set('authenticate', 'facebook');
-    var left = this.get('lastX') - 400;
-    var top = this.get('lastY') - 200;
-    return window.open(Discourse.getURL("/auth/facebook"), "_blank", "menubar=no,status=no,height=400,width=800,left=" + left + ",top=" + top);
-  },
-
-  casLogin: function() {
-    var left, top;
-    this.set('authenticate', 'cas');
-    left = this.get('lastX') - 400;
-    top = this.get('lastY') - 200;
-    return window.open("/auth/cas", "_blank", "menubar=no,status=no,height=400,width=800,left=" + left + ",top=" + top);
-   },
-
-  openidLogin: function(provider) {
-    var left = this.get('lastX') - 400;
-    var top = this.get('lastY') - 200;
-    if (provider === "yahoo") {
-      this.set("authenticate", 'yahoo');
-      return window.open(Discourse.getURL("/auth/yahoo"), "_blank", "menubar=no,status=no,height=400,width=800,left=" + left + ",top=" + top);
+    if(customLogin){
+      customLogin();
     } else {
-      window.open(Discourse.getURL("/auth/google"), "_blank", "menubar=no,status=no,height=500,width=850,left=" + left + ",top=" + top);
-      return this.set("authenticate", 'google');
+      this.set('authenticate', name);
+      var left = this.get('lastX') - 400;
+      var top = this.get('lastY') - 200;
+
+      var height = loginMethod.get("frameHeight") || 400;
+      var width = loginMethod.get("frameWidth") || 800;
+      window.open(Discourse.getURL("/auth/" + name), "_blank",
+          "menubar=no,status=no,height=" + height + ",width=" + width +  ",left=" + left + ",top=" + top);
     }
-  },
-
-  githubLogin: function() {
-    this.set('authenticate', 'github');
-    var left = this.get('lastX') - 400;
-    var top = this.get('lastY') - 200;
-    return window.open(Discourse.getURL("/auth/github"), "_blank", "menubar=no,status=no,height=400,width=800,left=" + left + ",top=" + top);
-  },
-
-  personaLogin: function() {
-    navigator.id.request();
   },
 
   authenticationComplete: function(options) {
     if (options.awaiting_approval) {
-      this.flash(Em.String.i18n('login.awaiting_approval'), 'success');
+      this.flash(I18n.t('login.awaiting_approval'), 'success');
       this.set('authenticate', null);
       return;
     }
     if (options.awaiting_activation) {
-      this.flash(Em.String.i18n('login.awaiting_confirmation'), 'success');
+      this.flash(I18n.t('login.awaiting_confirmation'), 'success');
       this.set('authenticate', null);
       return;
     }
@@ -153,7 +122,7 @@ Discourse.LoginController = Discourse.Controller.extend(Discourse.ModalFunctiona
       accountUsername: options.username,
       accountName: options.name,
       authOptions: Em.Object.create(options)
-    })
+    });
     this.send('showCreateAccount');
   }
 

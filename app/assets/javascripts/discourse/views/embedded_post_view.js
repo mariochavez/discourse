@@ -6,7 +6,7 @@
   @namespace Discourse
   @module Discourse
 **/
-Discourse.EmbeddedPostView = Discourse.View.extend({
+Discourse.EmbeddedPostView = Discourse.GroupedView.extend({
   templateName: 'embedded_post',
   classNames: ['reply'],
 

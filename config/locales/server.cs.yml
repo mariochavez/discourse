@@ -12,6 +12,8 @@ cs:
   time:
     formats:
       short: "%d.%m.%Y"
+      short_no_year: "%-d %B"
+      date_only: "%-d %b %Y"
 
   title: "Discourse"
   topics: "Témata"
@@ -40,6 +42,11 @@ cs:
     one: "Bohužel, návštěvníci mohou do jednoho příspěvku vložit jen jeden obrázek."
     few: "Bohužel, návštěvníci mohou do jednoho příspěvku vložit maximálně %{count} obrázky."
     other: "Bohužel, návštěvníci mohou do jednoho příspěvku vložit maximálně %{count} obrázků."
+  too_many_attachments:
+    zero: "Bohužel, noví uživatelé nemohou do příspěvků vkládat přílohy."
+    one: "Bohužel, noví uživatelé smějí do příspěvku vložit jen jednu přílohu."
+    few: "Bohužel, noví uživatelé smějí do příspěvku vložit jen %{count} přílohy."
+    other: "Bohužel, noví uživatelé smějí do příspěvku vložit jen %{count} příloh."
   too_many_links:
     zero: "Bohužel, návštěvníci nemohou vkládat odkazy do příspěvků."
     one: "Bohužel, návštěvníci mohou do jednoho příspěvku vložit jen jeden odkaz."
@@ -58,8 +65,13 @@ cs:
   rss_topics_in_category: "RSS feed témat z kategorie '%{category}'"
   author_wrote: "%{author} napsal:"
   private_message_abbrev: "SZ"
+  rss_description:
+    latest: "Poslední témata"
+    hot: "Populární témata"
 
   groups:
+    errors:
+      can_not_modify_automatic: "Automatickou skupinu nelze upravit"
     default_names:
       admins: "admins"
       moderators: "moderators"
@@ -116,7 +128,7 @@ cs:
               cant_send_pm: "Bohužel, tomuto uživateli nemůžete poslat soukromou zprávu."
 
   user_profile:
-    no_info_me: "<div class='missing-profile'>Pole 'o mně' je v tuto chvíli prázdné, <a href='/users/%{username_lower}/preferences'>nechcete si ho vyplnit?</a></div>"
+    no_info_me: "<div class='missing-profile'>Pole 'o mně' je v tuto chvíli prázdné, <a href='/users/%{username_lower}/preferences/about-me'>nechcete si ho vyplnit?</a></div>"
     no_info_other: "<div class='missing-profile'>%{name} o sobě zatím žádné informace nevyplnil</div>"
 
   category:
@@ -135,6 +147,8 @@ cs:
       title: "vůdce"
     elder:
       title: "starší"
+    change_failed_explanation: "Pokusili jste se změnil důvěryhodnost uživatele %{user_name} na '%{new_trust_level}'. Jejich důvěryhodnost je ale již '%{current_trust_level}'. %{user_name} zůstané na důvěryhodnosti '%{current_trust_level}'"
+
 
   rate_limiter:
     too_many_requests: "Děláte tuto akci příliš často. Prosím počkejte %{time_left} a zkuste to znovu."
@@ -413,12 +427,17 @@ cs:
     cas_config_warning: 'Server je nakonfigurován, aby povoloval registraci a přihlášení přes CAS (enable_cas_logins), ale nejsou správně nastaveny hodnoty "hostname" a "domain name".'
     twitter_config_warning: 'Server je nakonfigurován, aby povoloval registraci a přihlášení přes Twitter (enable_twitter_logins), ale nejsou nastaveny hodnoty "key" a "secret". Navštivte <a href="/admin/site_settings">nastevení webu</a> a opravte nastavení. <a href="https://github.com/discourse/discourse/wiki/The-Discourse-Admin-Quick-Start-Guide#enable-twitter-logins" target="_blank">Pro více informací si přečtěte tento návod</a>.'
     github_config_warning: 'Server je nakonfigurován, aby povoloval registraci a přihlášení přes GitHub (enable_github_logins), ale nejsou nastaveny hodnoty "client id" a "secret". Navštivte <a href="/admin/site_settings">nastevení webu</a> a opravte nastavení. <a href="https://github.com/discourse/discourse/wiki/The-Discourse-Admin-Quick-Start-Guide" target="_blank">Pro více informací si přečtěte tento návod</a>.'
+    s3_config_warning: 'Server je nakonfigurován, aby nahrával soubory na S3, ale chybí nastavení: s3_access_key_id, s3_secret_access_key nebo s3_upload_bucket. Navštivte <a href="/admin/site_settings">nastavení webu</a> a opravte nastavení. <a href="http://meta.discourse.org/t/how-to-set-up-image-uploads-to-s3/7229" target="_blank">Přečtěte si "How to set up image uploads to S3?" pro více informací</a>.'
+    image_magick_warning: 'Server je nakonfigurován, aby vytvářel náhledy velkých obrázků, ale není nainstalován ImageMagick. Nainstalujte ImageMagick pomocí vašeho oblíbeného balíčkovače, nebo navštivte <a href="http://www.imagemagick.org/script/binary-releases.php" target="_blank">web ImageMagick pro stažení aktuální verze</a>.'
     failing_emails_warning: "%{num_failed_jobs} emailů se nepodařilo odeslat. Zkontrolujte soubor config/production.rb a ujistěte se, že máte správné nastavení config.action_mailer."
     default_logo_warning: "Nenastavili jste si vlastní logo pro váš web. Aktualizujte hodnoty logo_url, logo_small_url, a favicon_url v <a href='/admin/site_settings'>Nastavení webu</a>."
     contact_email_missing: "Neposkytli jste kontaktní email pro váš web. Prosím, aktualizujte položku contact_email v <a href='/admin/site_settings'>Nastavení webu</a>."
     contact_email_invalid: "Kontaktní email je neplatný. The site contact email is invalid. Prosím, aktualizujte položku contact_email v <a href='/admin/site_settings'>Nastavení webu</a>."
     title_nag: "Název webu je nastaven na výchozí hodnotu. Prosím, změňte název webu na skutečný název v <a href='/admin/site_settings'>Nastavení webu</a>."
     consumer_email_warning: "Váš web je nastaven, aby používal Gmail (nebo jinou uživatelskou emailovou službu) k odesílání emailů. <a href='http://support.google.com/a/bin/answer.py?hl=en&answer=166852' target='_blank'>Gmail limituje počet emailů, které můžete odeslat</a>. Zvažte použití jiného emailového poskytovatele, jako je třeba mandrill.com k zajištění doručitelnosti emailů."
+    access_password_removal: "Váš web používá nastavení access_password, které je již odstraněno. Nová nastavení login_required a must_approve_users by měla být použita místo toho. Nastavení můžete změnit v<a href='/admin/site_settings'>Nastavení webu</a>. Nezapomeňte <a href='/admin/users/list/pending'>schválit uživatele v seznamu čekajících uživatelůt</a>. (Tato zpráva zmizí za 2 dny.)"
+    system_username_warning: "Nastavení system_username je prázdné. Prosím, napravte to v <a href='/admin/site_settings'>Nastavení webu</a>. Nastavte ho na uživatelské jméno administrátora, která má být odesilatelem systémových zpráv."
+    notification_email_warning: "Nastavení notification_email je prázdné. Prosím, napravte to v <a href='/admin/site_settings'>Nastavení webu</a>."
 
   content_types:
     education_new_reply:
@@ -436,17 +455,24 @@ cs:
     welcome_invite:
       title: "Uvítání: Pozvaný uživatel"
       description: "Soukromá zpráva, která je automaticky zaslaná novým pozvaným uživatelům, když přijmou pozvánku."
-
+    privacy_policy:
+      title: "Ochrana soukromí"
+      description: "Podmínky ochrany soukromí vašeho webu. Nechte prázdné pro výchozí podmínky."
+    faq:
+      title: "FAQ"
+      description: "Často kladené otázky (FAQ) vašeho webu. Nechte prázdné pro výchozí FAQ."
     login_required_welcome_message:
       title: "Vyžadováno přihlášení: Uvítací zpráva"
       description: "Uvítací zpráva, která je zobrazena nepřihlášeným uživatelům, je-li zapnuto nastavení 'vyžadovat přihlášení'."
-
     tos_user_content_license:
       title: "Podmínky používání: Licence obsahu"
       description: "Text sekce 'licence obsahu' z Podmínek používání."
     tos_miscellaneous:
       title: "Podmínky používání: Různé"
       description: "Text sekce 'různé' z Podmínek používání."
+    login_required:
+      title: "Vyžadováno přihlášení: Úvodní stránka"
+      description: "Text, který se zobrazí nepřihlášených uživatelům na webu, je-li přihlášení vyžadováno."
 
   site_settings:
     default_locale: "Výchozí jazyk této Discourse instance (kód ve formátu ISO 639-1)"
@@ -469,7 +495,6 @@ cs:
     company_short_name: "Krátké jméno společnosti, která provozuje tento web, používá se v dokumentech jako je /tos"
     company_domain: "Doménové jméno vlastněné společností, která provozuje tento web, používá se v dokumentech jako je /tos"
     api_key: "Zabezpečený API klíč, který se používá pro vytváření a aktualizaci témat, použijte sekci /admin/api k nastavení"
-    access_password: "Restrict_access je nastaveno, ujistěte se, že je zde nastaveno heslo"
     queue_jobs: "Zařazovat úlohy do fronty v sidekiq, není-li nastaveno, jsou úlohy vyřizovány okamžitě"
     crawl_images: "Povolit získávání obrázků z webů třetích stran"
     ninja_edit_window: "Jak rychle smíte udělat změnu, aniž by se uložila jako nová verze"
@@ -486,10 +511,10 @@ cs:
     logo_url: "Logo vašeho webu, např. http://example.com/logo.png"
     logo_small_url: "Malé logo, které se použije pokud odskrolujete dolů v tématu, např. http://example.com/logo-small.png"
     favicon_url: "Favicona vašeho webu, viz http://en.wikipedia.org/wiki/Favicon"
-    dynamic_favicon: "Zobrazovat počet oznámení ve favikoně"
     apple_touch_icon_url: "Ikona používaná pro doteková zařízení od firmy Apple. Doporučené rozměry jsou 144px krát 144px."
 
     notification_email: "Návratová emailová adresa, která se použije u systémových emailů, jako jsou notifikace o zapomenutém heslu, nových účtech, atd."
+    email_custom_headers: "Seznam vlastních hlaviček emailů, oddělený svislítkem"
     use_ssl: "Má být web přístupný přes SSL? (NEPODPOROVÁNO, EXPERIMENTÁLNÍ FUNKCE)"
     best_of_score_threshold: "Minimální skóre příspěvku, aby byl zařazen mezi 'nejlepší'"
     best_of_posts_required: "Minimální počet příspěvků v tématu, aby byl povolen mód 'nejlepší příspěvky'"
@@ -516,6 +541,8 @@ cs:
     must_approve_users: "Administrátoři musí schválit všechny uživatele, než získají přístup"
     ga_tracking_code: "Kód pro sledování přes 'Google analytics', např. UA-12345678-9; viz http://google.com/analytics"
     ga_domain_name: "Doménové jméno pro Google analytics, např. mysite.com; viz http://google.com/analytics"
+    enable_escaped_fragments: "Povolit alternativní řešení, které pomůže starým webovým robotům indexovat váš web. VAROVÁNÍ: povolte pouze v případě, že to opravdu potřebujete."
+    enable_noscript_support: "Povolit podporu &lt;noscript&gt; tagu"
     top_menu: "Určuje, které položky se zobrazí v navigaci na hlavní stránce a v jakém pořadí. Příklad: latest|hot|read|favorited|unread|new|posted|categories"
     post_menu: "Určuje, které položky se zobrazí v menu u příspěvku a v jakém pořadí. Příklad: like|edit|flag|delete|share|bookmark|reply"
     share_links: "Určuje, které položky se zobrazí ve sdílecím dialogu a v jakém pořadí. Příklad: twitter|facebook|google+"
@@ -524,7 +551,9 @@ cs:
     posts_per_page: "Kolik příspěvků je zobrazeno ve stránce tématu"
     system_username: "Uživatelské jméno, za které se zasílají automatické soukromé zprávy"
     send_welcome_message: "Mají noví uživatelé obdržet uvítací soukromou zprávu?"
-    supress_reply_directly_below: "Nezobrazovat počet odpovědí, pokud existuje jen jediná odpověď hned pod příspěvkem"
+    suppress_reply_directly_below: "Nezobrazovat počet odpovědí, pokud existuje jen jediná odpověď hned pod příspěvkem"
+    suppress_reply_directly_above: "Nezobrazovat informaci 'je odpověď na' u příspěvku, jehož odpověď je přímo nad ním"
+
     allow_index_in_robots_txt: "Povolit robotům indexaci tohoto webu (aktualizuje robots.txt)"
     email_domains_blacklist: "Seznam domén, jejichž emailové adresy nebudou přijímány, oddělený znakem '|'. Příklad: mailinator.com|trashmail.net"
     email_domains_whitelist: "Seznam domén, ze kterých bude povolena registrace, oddělený znamek '|'. POZOR: Emailové adresy z jiných než z těchto domén nebudou přijímány."
@@ -592,6 +621,8 @@ cs:
     s3_secret_access_key: "Hodnota 'server access key' služby Amazon S3, která se použije pro nahrávání obrázku"
     s3_region: "Hodnota 'region' služby Amazon S3, která se použije pro nahrávání obrázku"
 
+    enable_flash_video_onebox: "Povolit embedování SWF a FLV odkazů do oneboxu (může znamenat bezpečnostní riziko, doporučujeme opatrnost)"
+
     default_invitee_trust_level: "Výchozí věrohodnost pozvaných uživatelů (0-4)"
     default_trust_level: "Výchozí věrohodnost uživatelů (0-4)"
 
@@ -607,14 +638,16 @@ cs:
     regular_requires_likes_given: "Kolik 'líbí se' musí základní uživatel rozdat, než může získat stálou (2) věrohodnost"
     regular_requires_topic_reply_count: "Do kolika témat musí základní uživatel odpovědět, než může získat stálou (2) věrohodnost"
 
-    newuser_max_links: "Kolik odkazů může návštěvník vložit do příspěvku"
-    newuser_max_images: "Kolik obrázků může návštěvník vložit do příspěvku"
-    newuser_max_mentions_per_post: "Kolik zmínek přes @name může návštěvník vložit do příspěvku"
+    newuser_max_links: "Kolik odkazů může nový uživatel vložit do příspěvku"
+    newuser_max_images: "Kolik obrázků může nový uživatel vložit do příspěvku"
+    newuser_max_attachments: "Kolik příloh může nový uživatel vložit do příspěvku"
+    newuser_max_mentions_per_post: "Kolik zmínek přes @name může nový uživatel vložit do příspěvku"
     max_mentions_per_post: "Maximální počet zmínek přes @name, které mohou být použity v jednom příspěvku"
 
-    auto_link_images_wider_than: "Obrázky širší než tato hodnota v pixelech budou odkazovány do lightboxu"
+    create_thumbnails: "Vytvářet náhledy pro obrázky v lightboxu"
 
     email_time_window_mins: "Kolik minut se čeká než se uživateli zašle email, aby měl možnost obsah vidět sám od sebe"
+    email_posts_context: "Kolik příspěvků se má zobrazovat v emailech pro vyjádření kontextu"
     flush_timings_secs: "Jak často se vynulují časovací data na serveru, v sekundách"
     max_word_length: "Maximální povolená délka slova ve znacích v názvu tématu"
     title_min_entropy: "Minimální entropie (unikátní znaky) požadovaná v názvu tématu"
@@ -626,7 +659,9 @@ cs:
     min_body_similar_length: "Minimální délka těla příspěvku, než budou hledána podobná témata"
 
     category_colors: "Seznam hexadecimálních barev oddělený svislítkem (|) pro barvy kategorií"
-    max_upload_size_kb: "Maximální povolená velikost nahrávaných souborů v kB - nezapomeňte tento limit změnit v nginx (client_max_body_size) / apache a na proxy serverech."
+    max_image_size_kb: "Maximální povolená velikost nahrávaných souborů v kB - nezapomeňte tento limit změnit v nginx (client_max_body_size) / apache a na proxy serverech."
+    max_attachment_size_kb: "Maximální povolená velikost příloh souborů v kB - nezapomeňte tento limit změnit v nginx (client_max_body_size) / apache a na proxy serverech."
+    authorized_extensions: "Seznam povolených přípon souborů pro nahrávání, oddělený svislítkem (|)"
     max_similar_results: "Kolik podobných témat se má zobrazovat uživateli, když vytváří nové téma"
 
     title_prettify: "Zabrání běžným překlepům a chybám v názvu tématu, včetně psaní velkými písmeny, malé písmeno na začátku, vícenásobné vykřičníky a otazníky, atd."
@@ -635,6 +670,7 @@ cs:
     topic_views_heat_medium: "Počet zobrazení, po nichž bude popularita tématu střední."
     topic_views_heat_high: "Počet zobrazení, po nichž bude popularita tématu vysoká."
 
+    faq_url: "Pokud máte dokument FAQ hostovaný samostatně, napište sem jeho plnou URL."
     tos_url: "Pokud máte dokument 'Podmínky Používání' hostovaný samostatně, napište sem jeho plnou URL."
     privacy_policy_url: "Pokud máte dokument 'Ochrana Soukromí' hostovaný samostatně, napište sem jeho plnou URL."
 
@@ -643,6 +679,19 @@ cs:
 
     reply_by_email_enabled: "Jestli toto fórum umožňuje odpovědi emailem"
     reply_by_email_address: "Šablona emailé adresy pro odpověď emailem, např. %{reply_key}@reply.myforum.com"
+
+    pop3s_polling_enabled: "Dotazovat se přes POP3S pro emailové odpovědi"
+    pop3s_polling_port: "Port pro dotazování přes účet POP3S"
+    pop3s_polling_host: "Hostitelské jméno pro dotazování přes POP3S"
+    pop3s_polling_username: "Uživatelské jméno pro dotazování přes POP3S"
+    pop3s_polling_password: "Heslo pro dotazování přes POP3S"
+
+    minimum_topics_similar: "Kolik témat musí v databázi existovat, než se začne nabízet menu s podobnými tématy."
+
+    relative_date_duration: "Počet dní od zaslání příspěvku, po které se budou datumy zobrazovat relativně namísto absolutně. Příklady: relativně: 7d, absolutně: 20. února"
+    delete_user_max_age: "Maximální stáří uživatele ve dnech, který může být smazán administrátorem."
+    delete_all_posts_max: "Maximální počet příspěvků, které mohou být smazány najednou tlačítkem 'Odstranit všechny příspěvky'. Pokud má uživatel více příspěvků než je zde nastaveno, nemohou být jeho příspěvky smazány najednou a uživatele nelze odstranit."
+
 
   notification_types:
     mentioned: "%{display_username} vás zmínil v %{link}"
@@ -668,10 +717,14 @@ cs:
   frequent_poster: "Častý zasilatel"
 
   move_posts:
-    moderator_post:
+    new_topic_moderator_post:
       one: "Přesunul jsem příspěvek do nového tématu: %{topic_link}"
       few: "Přesunul jsem %{count} příspěvky do nového tématu: %{topic_link}"
       other: "Přesunul jsem %{count} příspěvků do nového tématu: %{topic_link}"
+    existing_topic_moderator_post:
+      one: "Přesunul jsem příspěvek do existujícího tématu: %{topic_link}"
+      few: "Přesunul jsem %{count} příspěvky do existujícího tématu: %{topic_link}"
+      other: "Přesunul jsem %{count} příspěvků do existujícího tématu: %{topic_link}"
 
   topic_statuses:
     archived_enabled: "Toto téma je archivováno. Je zmraženo a již nemůže být nijak změněno."
@@ -696,6 +749,7 @@ cs:
     active: "Váš účet je aktivní a připraven k používání."
     activate_email: "Už to skoro bude! Zaslali jsme vám aktivační email na <b>%{email}</b>. Prosím následujte instrukce v tomto emailu a aktivujte si tak svůj účet."
     not_activated: "Ještě se nemůžete přihlásit. Zaslali jsme vám aktivační email na <b>%{email}</b>. Prosím následujte instrukce v tomto emailu a aktivujte si tak svůj účet."
+    banned: "Máte zakázáno přihlášení až do %{date}."
     errors: "%{errors}"
     not_available: "Není k dispozici. Nechcete zkusit %{suggestion}?"
     something_already_taken: "Nastala chyba při zpracování, zřejmě je dané uživatelské jméno nebo email již zaregistrován. Zkuste odkaz pro obnovení hesla."
@@ -712,6 +766,7 @@ cs:
       must_begin_with_alphanumeric: "musí začínat písmenem nebo číslicí"
     email:
       not_allowed: "není povolen od tohoto emailového poskytovatele. Prosím použijte jinou emailovou adresu."
+      blocked: "není povolen."
 
   invite_mailer:
     subject_template: "[%{site_name}] %{invitee_name} vás pozval do diskuze na %{site_name}"
@@ -764,15 +819,7 @@ cs:
 
       <small>V každém emailu, který zasíláte, by měl být odkaz na odhlášení příjmu emailů, tak tady je taky takový. Tento email vám zaslala Velká Společnost s.r.o., Hlavní ul. 1337, Kotěhůlky, Česká republika. Pokud již od nás nechcete dostávat další emaily, [klikněte sem pro odhlášení][5].</small>
 
-  request_access:
-    code: "Přístupový kód"
-    instructions: "Tento web má omezený přístup, zadejte prosím přístupový kód:"
-    enter: "Vstoupit"
-    incorrect: "přístupový kód je neplatný"
-
   system_messages:
-    site_password: "Mimochodem, přístupový kód na tento web je `%{access_password}`, pokud ho budete potřebovat."
-
     post_hidden:
       subject_template: "%{site_name} Oznámení: Příspěvek skryt kvůli hlášením od komunity"
       text_body_template: |
@@ -883,6 +930,15 @@ cs:
 
         Pro další informace se prosím obraťte na naše [FAQ](%{base_url}/faq).
 
+    blocked_by_staff:
+      subject_template: "Účet zablokován"
+      text_body_template: |
+        Ahoj,
+
+        Toto je automatizovaná zpráva z %{site_name}, která vás má informovat o tom, že váš účet byl zablokován moderátorem.
+
+        Pro další informace se prosím obraťte na naše [FAQ](%{base_url}/faq).
+
     user_automatically_blocked:
       subject_template: "Uživatel %{username} byl automaticky zablokován"
       text_body_template: |
@@ -909,9 +965,15 @@ cs:
   unsubscribe_link: "Pokud již od nás nechcete dostávat emaily, navšivte stránku s vašimi [uživatelskými preferencemi](%{user_preferences_url})."
 
   user_notifications:
+    previous_discussion: "Předchozí diskuze"
     unsubscribe:
       title: "Odhlásit z odběru emailů"
       description: "Nechcete již od nás dostávat emaily? Žádný problém! Klikněte na odkaz níže pro okamžité odhlášení z odběru emailů:"
+
+    reply_by_email: "Pro odpověd stačí odepsat na tento email, nebo navštivte %{base_url}%{url} ve vašem prohlížeči."
+    visit_link_to_respond: "Pro odpověď navštive %{base_url}%{url} ve vašem prohlížeči."
+
+    posted_by: "Zaslal uživatel %{username} dne %{post_date}"
 
     user_invited_to_private_message:
       subject_template: "[%{site_name}] %{username} vás pozval k soukromé konverzaci na téma '%{topic_title}'"
@@ -954,7 +1016,7 @@ cs:
         Prosím navšivte tento odkaz, chcete-li odpovědět: %{base_url}%{url}
 
     user_posted:
-      subject_template: "[%{site_name}] %{username} přispěl do tématu '%{topic_title}'"
+      subject_template: "[%{site_name}] %{subject_prefix}%{username} přispěl do tématu '%{topic_title}'"
       text_body_template: |
         %{username} přispěl do tématu '%{topic_title}' na %{site_name}:
 
@@ -973,17 +1035,6 @@ cs:
       click_here: "klikněte zde"
       from: "souhrn z %{site_name}"
       read_more: "Číst dále"
-
-    private_message:
-      subject_template: "[%{site_name}] %{subject_prefix}%{topic_title}"
-      text_body_template: |
-        %{from} vám právě zaslal soukromou zprávu
-
-        ---
-        %{message}
-
-        ---
-        Prosím navšivte tento odkaz, chcete-li odpovědět: %{base_url}%{url}
 
     forgot_password:
       subject_template: "[%{site_name}] Obnovení hesla"
@@ -1044,7 +1095,7 @@ cs:
   login_required:
     welcome_message: |
       #[Vítejte na %{title}](#welcome)
-      Jsme rádi, že vás tu máme a že přispíváte do tématu %{title}. Prosím, vytvořte si účet nebo se přihlašte pro pokračování.
+      Jsme rádi, že vás tu máme a že přispíváte do tématu %{title}. Prosím, vytvořte si účet nebo se přihlaste pro pokračování.
 
   terms_of_service:
     user_content_license: |
@@ -1054,7 +1105,12 @@ cs:
   deleted: 'smazáno'
 
   upload:
-    image:
+    unauthorized: "Bohužel, soubor, který se snažíte nahrát, není povolený (povolené přípony: %{authorized_extensions})."
+    pasted_image_filename: "Vložený obrázek"
+    attachments:
+      too_large: "Bohužel, soubor, který se snažíte nahrát, je příliš velký (maximální velikost je %{max_size_kb}%kb)."
+    images:
+      too_large: "Bohužel, obrázek, který se snažíte nahrát, je příliš velký (maximální velikost je %{max_size_kb}%kb), prosím zmenšete ho a zkuste to znovu."
       fetch_failure: "Bohužel, nastala chybí při získávání obrázku."
       unknown_image_type: "Bohužel, soubor, který se snažíte nahrát, zřejmě není obrázek."
       size_not_found: "Bohužel se nepodařilo zjistit velikost obrázku. Není soubor s obrázkem poškozený?"

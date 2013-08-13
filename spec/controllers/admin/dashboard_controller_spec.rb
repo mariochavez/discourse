@@ -1,6 +1,11 @@
 require 'spec_helper'
+require_dependency 'discourse_version_check'
 
 describe Admin::DashboardController do
+  before do
+    AdminDashboardData.stubs(:fetch_cached_stats).returns({reports:[]})
+    Jobs::VersionCheck.any_instance.stubs(:execute).returns(true)
+  end
 
   it "is a subclass of AdminController" do
     (Admin::DashboardController < Admin::AdminController).should be_true
@@ -37,13 +42,6 @@ describe Admin::DashboardController do
           json = JSON.parse(response.body)
           json['version_check'].should_not be_present
         end
-      end
-
-      it 'returns report data' do
-        xhr :get, :index
-        json = JSON.parse(response.body)
-        json.should have_key('reports')
-        json['reports'].should be_a(Array)
       end
     end
 

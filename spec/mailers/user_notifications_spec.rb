@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe UserNotifications do
 
-  let(:user) { Fabricate(:user) }
+  let(:user) { Fabricate(:admin) }
 
   describe ".signup" do
     subject { UserNotifications.signup(user) }
@@ -38,6 +38,24 @@ describe UserNotifications do
       its(:subject) { should be_present }
       its(:from) { should == [SiteSetting.notification_email] }
       its(:body) { should be_present }
+    end
+  end
+
+  describe '.user_replied' do
+    let!(:post) { Fabricate(:post) }
+    let!(:response) { Fabricate(:post, topic: post.topic)}
+    let!(:user) { Fabricate(:user) }
+    let!(:notification) { Fabricate(:notification, user: user) }
+
+    it 'generates a correct email' do
+      mail = UserNotifications.user_replied(response.user, post: response, notification: notification)
+
+      # 2 respond to links cause we have 1 context post
+      mail.html_part.to_s.scan(/To respond/).count.should == 2
+
+      # 1 unsubscribe
+      mail.html_part.to_s.scan(/To unsubscribe/).count.should == 1
+
     end
   end
 
@@ -91,7 +109,11 @@ describe UserNotifications do
       end
 
       it "has a message" do
-        expects_build_with(has_entry(:message, post.raw))
+        expects_build_with(has_key(:message))
+      end
+
+      it "has a context" do
+        expects_build_with(has_key(:context))
       end
 
       it "has an unsubscribe link" do

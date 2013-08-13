@@ -14,7 +14,7 @@ Discourse.AdminDashboardRoute = Discourse.Route.extend({
   },
 
   fetchDashboardData: function(c) {
-    if( !c.get('dashboardFetchedAt') || moment().subtract('hour', 1).toDate() > c.get('dashboardFetchedAt') ) {
+    if( !c.get('dashboardFetchedAt') || moment().subtract('minutes', 30).toDate() > c.get('dashboardFetchedAt') ) {
       c.set('dashboardFetchedAt', new Date());
       Discourse.AdminDashboard.find().then(function(d) {
         if( Discourse.SiteSettings.version_checks ){
@@ -23,12 +23,19 @@ Discourse.AdminDashboardRoute = Discourse.Route.extend({
         _.each(d.reports,function(report){
           c.set(report.type, Discourse.Report.create(report));
         });
-        c.set('admins', d.admins);
-        c.set('moderators', d.moderators);
-        c.set('blocked', d.blocked);
-        c.set('top_referrers', d.top_referrers);
-        c.set('top_traffic_sources', d.top_traffic_sources);
-        c.set('top_referred_topics', d.top_referred_topics);
+
+        var topReferrers = d.top_referrers;
+        if (topReferrers && topReferrers.data) {
+          d.top_referrers.data = topReferrers.data.map(function (user) {
+            return Discourse.AdminUser.create(user);
+          });
+          c.set('top_referrers', topReferrers);
+        }
+
+        ['admins', 'moderators', 'blocked', 'banned', 'top_traffic_sources', 'top_referred_topics', 'updated_at'].forEach(function(x) {
+          c.set(x, d[x]);
+        });
+
         c.set('loading', false);
       });
     }

@@ -13,7 +13,6 @@ Discourse.ListController = Discourse.Controller.extend({
   needs: ['composer', 'modal', 'listTopics'],
 
   availableNavItems: function() {
-    var summary = this.get('filterSummary');
     var loggedOn = !!Discourse.User.current();
 
     return Discourse.SiteSettings.top_menu.split("|").map(function(i) {
@@ -24,6 +23,29 @@ Discourse.ListController = Discourse.Controller.extend({
       return i !== null;
     });
   }.property(),
+
+  createTopicText: function() {
+    if (this.get('category.name')) {
+      return I18n.t("topic.create_in", {
+        categoryName: this.get('category.name')
+      });
+    } else {
+      return I18n.t("topic.create");
+    }
+  }.property('category.name'),
+
+  /**
+    Refresh our current topic list
+
+    @method refresh
+  **/
+  refresh: function() {
+    var listTopicsController = this.get('controllers.listTopics');
+    listTopicsController.set('model.loaded', false);
+    this.load(this.get('filterMode')).then(function (topicList) {
+      listTopicsController.set('model', topicList);
+    });
+  },
 
   /**
     Load a list based on a filter
@@ -64,7 +86,6 @@ Discourse.ListController = Discourse.Controller.extend({
     return Discourse.TopicList.list(current).then(function(items) {
       listController.setProperties({
         loading: false,
-        filterSummary: items.filter_summary,
         filterMode: filterMode,
         draft: items.draft,
         draft_key: items.draft_key,
@@ -81,12 +102,12 @@ Discourse.ListController = Discourse.Controller.extend({
   // Put in the appropriate page title based on our view
   updateTitle: function() {
     if (this.get('filterMode') === 'categories') {
-      return Discourse.set('title', Em.String.i18n('categories_list'));
+      return Discourse.set('title', I18n.t('categories_list'));
     } else {
       if (this.present('category')) {
-        return Discourse.set('title', this.get('category.name').capitalize() + " " + Em.String.i18n('topic.list'));
+        return Discourse.set('title', this.get('category.name').capitalize() + " " + I18n.t('topic.list'));
       } else {
-        return Discourse.set('title', Em.String.i18n('topic.list'));
+        return Discourse.set('title', I18n.t('topic.list'));
       }
     }
   }.observes('filterMode', 'category'),
@@ -105,7 +126,7 @@ Discourse.ListController = Discourse.Controller.extend({
   canEditCategory: function() {
     if( this.present('category') ) {
       var u = Discourse.User.current();
-      return u && u.admin;
+      return u && u.staff;
     } else {
       return false;
     }

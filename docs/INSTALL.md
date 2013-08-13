@@ -1,17 +1,25 @@
-# Discourse "Quick-and-Dirty" Install Guide
+# How Do I Install Discourse?
 
-It is still early times for Discourse. From our FAQ:
+It is still early times for Discourse. From [our FAQ](http://www.discourse.org/faq/):
 
 > Discourse is brand new. Discourse is early beta software, and likely to remain so for many months.
 > Please experiment with it, play with it, give us feedback, submit pull requests – but any consideration
 > of fully adopting Discourse is for people and organizations who are eager to live on the bleeding and broken edge.
 
-Discourse has two fairly decent install documents now:
+Still interested?
 
-- Our [**official Ubuntu Server 12.04 LTS install document**][1]
-- [Unofficial Heroku install document][2]
+### [**Click here for the OFFICIAL INSTALL GUIDE**][1]
 
-Beyond that, if you are feeling extra *extra* adventurous you can try to set up following components manually:
+Alternately, you can try the [unofficial Heroku install guide][2], or the [BitNami Discourse Virtual Machine package][3].
+
+## Quick and Dirty Install
+
+### Hardware
+
+- Dual core CPU recommended
+- 2 GB RAM recommended (and 2 GB of swap space)
+
+### Software
 
 1. **Postgres 9.1+**
  - Enable support for HSTORE
@@ -29,6 +37,10 @@ Beyond that, if you are feeling extra *extra* adventurous you can try to set up 
   - Run a clockwork process for enqueing scheduled jobs
   - Run several Rails processes, preferably behind a proxy like Nginx.
 
+### Low memory (less than 2 GB)
+
+Remember you *will* need swap enabled (enough for a total of 4 GB, so 2 GB swap with 2 GB RAM, and 3 GB swap with 1 GB ram, etc) and working! To reduce memory footprint, clockwork can run inside your web server. If you launch the your web server with `EMBED_CLOCKWORK=1`, clockwork will run in a backgroud thread. As clockwork itself only performs scheduling, it will have very little impact on performance.
+
 [1]: https://github.com/discourse/discourse/blob/master/docs/INSTALL-ubuntu.md
 [2]: https://github.com/discourse/discourse/blob/master/docs/HEROKU.md
-
+[3]: http://bitnami.com/stack/discourse

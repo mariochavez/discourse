@@ -3,6 +3,10 @@ require 'spec_helper'
 describe SpamRulesEnforcer do
 
   before do
+    SystemMessage.stubs(:create)
+  end
+
+  before do
     SiteSetting.stubs(:flags_required_to_hide_post).returns(0) # never
     SiteSetting.stubs(:num_flags_to_block_new_user).returns(2)
     SiteSetting.stubs(:num_users_to_block_new_user).returns(2)
@@ -107,33 +111,34 @@ describe SpamRulesEnforcer do
       subject.stubs(:block?).returns(true)
     end
 
-    it "hides all the user's posts" do
-      subject.punish_user
-      expect(post.reload).to be_hidden
-    end
-
-    it "hides the topic if the post was the first post" do
-      subject.punish_user
-      expect(post.topic.reload).to_not be_visible
-    end
-
-    it 'prevents the user from making new posts' do
-      subject.punish_user
-      expect(Guardian.new(user).can_create_post?(nil)).to be_false
-    end
-
-    it 'sends private messages to the user and to moderators' do
-      SystemMessage.expects(:create).with(user, anything, anything)
-      moderator = Fabricate(:moderator)
-      GroupMessage.expects(:create).with do |group, msg_type, params|
-        group == Group[:moderators].name and msg_type == :user_automatically_blocked and params[:user].id == user.id
+    context 'user is not blocked' do
+      before do
+        UserBlocker.expects(:block).with(user, nil, has_entries(message: :too_many_spam_flags)).returns(true)
       end
-      subject.punish_user
+
+      it 'prevents the user from making new posts' do
+        subject.punish_user
+        expect(Guardian.new(user).can_create_post?(nil)).to be_false
+      end
+
+      it 'sends private message to moderators' do
+        moderator = Fabricate(:moderator)
+        GroupMessage.expects(:create).with do |group, msg_type, params|
+          group == Group[:moderators].name and msg_type == :user_automatically_blocked and params[:user].id == user.id
+        end
+        subject.punish_user
+      end
     end
 
-    it 'sets the blocked flag' do
-      subject.punish_user
-      expect(user.reload.blocked).to be_true
+    context 'user is already blocked' do
+      before do
+        UserBlocker.expects(:block).with(user, nil, has_entries(message: :too_many_spam_flags)).returns(false)
+      end
+
+      it "doesn't send a pm to moderators if the user is already blocked" do
+        GroupMessage.expects(:create).never
+        subject.punish_user
+      end
     end
   end
 
@@ -217,27 +222,6 @@ describe SpamRulesEnforcer do
       it 'returns false' do
         expect(subject.block?).to be_true
       end
-    end
-  end
-
-  describe "clear_user" do
-    let!(:admin)  { Fabricate(:admin) } # needed for SystemMessage
-    let(:user)    { Fabricate(:user) }
-    subject       { SpamRulesEnforcer.new(user) }
-
-    it 'sets blocked flag to false' do
-      subject.clear_user
-      expect(user.reload).to_not be_blocked
-    end
-
-    it 'sends a system message' do
-      SystemMessage.expects(:create).with(user, anything, anything)
-      subject.clear_user
-    end
-
-    it 'allows user to make new posts' do
-      subject.clear_user
-      expect(Guardian.new(user).can_create_post?(nil)).to be_true
     end
   end
 

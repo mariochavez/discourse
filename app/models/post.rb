@@ -34,8 +34,8 @@ class Post < ActiveRecord::Base
 
   validates_with ::Validators::PostValidator
 
-  # We can pass a hash of image sizes when saving to prevent crawling those images
-  attr_accessor :image_sizes, :quoted_post_numbers, :no_bump, :invalidate_oneboxes
+  # We can pass several creating options to a post via attributes
+  attr_accessor :image_sizes, :quoted_post_numbers, :no_bump, :invalidate_oneboxes, :cooking_options
 
   SHORT_POST_CHARS = 1200
 
@@ -45,6 +45,7 @@ class Post < ActiveRecord::Base
   scope :public_posts, -> { joins(:topic).where('topics.archetype <> ?', Archetype.private_message) }
   scope :private_posts, -> { joins(:topic).where('topics.archetype = ?', Archetype.private_message) }
   scope :with_topic_subtype, ->(subtype) { joins(:topic).where('topics.subtype = ?', subtype) }
+  scope :without_nuked_users, -> { where(nuked_user: false) }
 
   def self.hidden_reasons
     @hidden_reasons ||= Enum.new(:flag_threshold_reached, :flag_threshold_reached_again, :new_user_spam_threshold_reached)
@@ -54,9 +55,9 @@ class Post < ActiveRecord::Base
     @types ||= Enum.new(:regular, :moderator_action)
   end
 
-  def trash!
+  def trash!(trashed_by=nil)
     self.topic_links.each(&:destroy)
-    super
+    super(trashed_by)
   end
 
   def recover!
@@ -75,27 +76,23 @@ class Post < ActiveRecord::Base
     Digest::SHA1.hexdigest(raw.gsub(/\s+/, ""))
   end
 
-  def reset_cooked
-    @cooked_document = nil
-    self.cooked = nil
-  end
-
   def self.white_listed_image_classes
     @white_listed_image_classes ||= ['avatar', 'favicon', 'thumbnail']
   end
 
   def post_analyzer
-    @post_analyzer = PostAnalyzer.new(raw, topic_id)
+    @post_analyzers ||= {}
+    @post_analyzers[raw_hash] ||= PostAnalyzer.new(raw, topic_id)
   end
 
-  %w{raw_mentions linked_hosts image_count link_count raw_links}.each do |attr|
+  %w{raw_mentions linked_hosts image_count attachment_count link_count raw_links}.each do |attr|
     define_method(attr) do
-      PostAnalyzer.new(raw, topic_id).send(attr)
+      post_analyzer.send(attr)
     end
   end
 
   def cook(*args)
-    PostAnalyzer.new(raw, topic_id).cook(*args)
+    post_analyzer.cook(*args)
   end
 
 
@@ -262,12 +259,6 @@ class Post < ActiveRecord::Base
     PostCreator.before_create_tasks(self)
   end
 
-  # TODO: Move some of this into an asynchronous job?
-  # TODO: Move into PostCreator
-  after_create do
-    PostCreator.after_create_tasks(self)
-  end
-
   # This calculates the geometric mean of the post timings and stores it along with
   # each post.
   def self.calculate_avg_time
@@ -299,6 +290,7 @@ class Post < ActiveRecord::Base
   end
 
 
+  # TODO: move to post-analyzer?
   # Determine what posts are quoted by this post
   def extract_quoted_post_numbers
     temp_collector = []
@@ -343,6 +335,21 @@ class Post < ActiveRecord::Base
     private_posts.with_topic_subtype(topic_subtype).where('posts.created_at > ?', since_days_ago.days.ago).group('date(posts.created_at)').order('date(posts.created_at)').count
   end
 
+
+  def reply_history
+    post_ids = Post.exec_sql("WITH RECURSIVE breadcrumb(id, reply_to_post_number) AS (
+                              SELECT p.id, p.reply_to_post_number FROM posts AS p
+                                WHERE p.id = :post_id
+                              UNION
+                                 SELECT p.id, p.reply_to_post_number FROM posts AS p, breadcrumb
+                                   WHERE breadcrumb.reply_to_post_number = p.post_number
+                                     AND p.topic_id = :topic_id
+                            ) SELECT id from breadcrumb ORDER by id", post_id: id, topic_id: topic_id).to_a
+
+    post_ids.map! {|r| r['id'].to_i }.reject! {|post_id| post_id == id}
+    Post.where(id: post_ids).includes(:user, :topic).order(:id).to_a
+  end
+
   private
 
 
@@ -366,7 +373,7 @@ class Post < ActiveRecord::Base
     return if post.nil?
     post_reply = post.post_replies.new(reply_id: id)
     if post_reply.save
-      Post.update_all ['reply_count = reply_count + 1'], id: post.id
+      Post.where(id: post.id).update_all ['reply_count = reply_count + 1']
     end
   end
 end
@@ -411,6 +418,8 @@ end
 #  percent_rank            :float            default(1.0)
 #  notify_user_count       :integer          default(0), not null
 #  like_score              :integer          default(0), not null
+#  deleted_by_id           :integer
+#  nuked_user              :boolean          default(FALSE)
 #
 # Indexes
 #

@@ -74,11 +74,6 @@
     .gutter {
       width: 100px;
     }
-    article.boxed {
-      .read-icon {
-        left: 750px !important;
-      }
-    }
   }
 }
 
@@ -122,7 +117,6 @@
       display: inline-block;
       color: #808080;
       font-size: 13px;
-      text-shadow: 0 1px 0 $white;
       .discourse-touch & {
         visibility: visible;
       }
@@ -141,6 +135,7 @@
         line-height: 19px;
         text-align: center;
         background-color: #fafafa;
+        padding: 1px 2px;
         @include border-radius-all(20px);
         &:after {
           display: block;
@@ -156,6 +151,8 @@
     }
     .reply-new i {
       padding-top: 2px;
+      padding-left: 3px;
+      padding-right: 3px;
       line-height: 17px;
       color: $attention_fg;
       background-color: $attention_bg;
@@ -202,13 +199,6 @@
     }
   }
   @include hover {
-    .read-icon {
-      i {
-        &:before {
-          font-size: 25px;
-        }
-      }
-    }
     section.post-menu-area {
       display: block;
     }
@@ -253,7 +243,6 @@
   section.post-menu-area {
     @include unselectable;
     background-color: $post_footer;
-    border-top: 1px solid $inner_border;
     overflow: hidden;
     @include box-shadow(inset 0 -4px 4px -4px rgba($black, 0.14));
     nav.post-controls {
@@ -265,7 +254,7 @@
         background: $post_footer;
         font-size: 15px;
         padding: 8px 10px;
-        border-left: 1px solid $inner_border;
+        border-left: 1px solid lighten($inner_border, 3%);
         vertical-align: top;
         @include box-shadow(inset 0 -4px 4px -4px rgba($black, 0.14));
         &:hover {
@@ -281,6 +270,25 @@
         }
         &.like, &.edit, &.flag, &.delete, &.share, &.bookmark, &.create {
           float: right;
+        }
+        .read-icon {
+          &:before {
+            font-family: "FontAwesome";
+            content: "\f02e";
+          }
+          &.unseen {
+            &:before {
+              content: "\f097";
+            }
+          }
+          &.last-read {
+            color: $red;
+          }
+          &.bookmarked {
+            &:before {
+              color: $bookmarkColor;
+            }
+          }
         }
       }
       button.create {
@@ -349,6 +357,8 @@
       }
 
       .staff a {
+        @include border-radius-all(3px);
+        padding: 1px 3px;
         background-color: #ffe;
         border: 1px solid #ffd;
       }
@@ -363,18 +373,30 @@
       .score {
         font-size: 12px;
       }
+      .user-title {
+        font-size: 11px;
+        margin-top: 2px;
+        line-height: 15px;
+        color: #555;
+      }
     }
+  }
+  .topic-meta-data-inside {
+    float: right;
+    z-index: 490;
+    margin-left: 20px;
     .post-info {
-      margin-top: -1px;
-      line-height: 12px;
-      a {
-        color: rgba(#323232, 0.9);
-        font-size: 10px;
+      font-size: 12px;
+      display: inline-block;
+      margin-right: 12px;
+      &.edits {
+        a, a:visited {
+          color: #aaa;
+        }
       }
-      .bar {
-        color: $muted-link-color;
-        font-size: 10px;
-      }
+    }
+    .post-date {
+      color: #aaa;
     }
   }
   .reply-to-tab {
@@ -401,21 +423,28 @@
   .embedded-posts.bottom {
     @include border-radius-bottom(4px);
     border-bottom: 1px solid #b9b9b9;
-    display: none;
     overflow: hidden;
+    .arrow {
+      float: right;
+      margin: 3px 0 3px 0;
+    }
   }
   .embedded-posts.top {
     @include border-radius-top(4px);
-    border-top: 1px solid #b9b9b9;
+    border-top: 1px solid #ddd;
     overflow: hidden;
   }
 
   .embedded-posts {
     background-color: #e9e6e6;
 
+    .topic-meta-data-inside {
+      margin: 3px -8px 3px 20px;
+    }
+
     div.reply {
-      border-left: 1px solid #b9b9b9;
-      border-right: 1px solid #b9b9b9;
+      border-left: 1px solid #ddd;
+      border-right: 1px solid #ddd;
       padding: 10px;
       margin: 0;
       background-clip: padding-box;
@@ -436,7 +465,7 @@
       }
       .topic-body {
         z-index: 10;
-        border: 1px solid #b9b9b9;
+        border: 1px solid #ddd;
         padding: 0 8px;
         color: black;
         background-color: $white;
@@ -451,11 +480,8 @@
         }
 
         a.arrow {
-          float: right;
-          margin: 3px 0 3px 0;
           color: grey;
         }
-
       }
       .about {
         .contents {
@@ -484,11 +510,7 @@
     position: relative;
     font-size: 16px;
     line-height: 20px;
-    @include small-width {
-      .read-icon {
-        right: 365px !important;
-      }
-    }
+
     .post-select {
       @include border-radius-all(4px);
       background-color: $light_gray;
@@ -499,52 +521,30 @@
       color: $darkish_gray;
       top: 4px;
       position: absolute;
-      right: 316px;
+      right: 5px;
       font-size: 12px;
       padding: 2px 5px;
       z-index: 490;
     }
-    .read-icon {
-      @include transition(opacity 1s);
-      opacity: 0;
-      position: absolute;
-      top: -3px;
-      left: 800px;
-      width: 16px;
-      height: 22px;
-      z-index: 490;
-      font-size: 20px;
-      cursor: pointer;
-      &:before {
-        font-family: "FontAwesome";
-        content: "\f02e";
-      }
-      &.seen {
-        color: $gray;
-        opacity: 1;
-      }
-      &.last-read {
-        color: $red;
-        opacity: 1;
-      }
-      &.bookmarked {
-        &:before {
-          color: $bookmarkColor;
-        }
-        opacity: 1;
-      }
-    }
+
     img {
       max-width: 100%;
     }
+    video {
+      max-width: 100%;
+      height: auto;
+    }
+    audio {
+      max-width: 100%;
+    }
+
     .topic-body {
       position: relative;
       .contents {
         .cooked {
-          padding: 12px 10px 0;
+          padding: 10px 10px 0;
         }
         position: relative;
-        border: 1px solid #b9b9b9;
         padding: 0;
         background-color: $white;
         word-wrap: break-word;
@@ -567,7 +567,14 @@
         @include box-shadow(0 1px 2px rgba($black, 0.07));
       }
       .contents.avoid-tab {
+        .topic-meta-data-inside {
+          position: relative;
+          top: -30px;
+        }
         padding-top: 30px;
+        .cooked {
+          padding-top: 10px;
+        }
       }
       .post-actions {
         padding: 3px 0 0px 15px;
@@ -584,9 +591,6 @@
       font-size: 14px;
       color: $dark_gray;
     }
-  }
-  &.replies-above .boxed .topic-body .contents {
-    @include border-radius-top(0);
   }
 }
 
@@ -627,7 +631,7 @@
     top: 12px;
     left: -9px;
     border-width: 10px 10px 10px 0;
-    border-right-color: #b9b9b9;
+    border-right-color: #dfdfdf;
   }
   &:after {
     top: 13px;
@@ -659,7 +663,6 @@
 
 .topic-summary {
   margin-top: 8px;
-  border: 1px solid #b9b9b9;
   background-color: darken($white, 3%);
   @include border-radius-all(4px);
   @include box-shadow(0 1px 2px rgba($black, 0.07));
@@ -775,7 +778,7 @@
   }
 }
 
-// Private messages
+// Custom Gutter Glyphs
 // --------------------------------------------------
 
 .private_message .gutter {
@@ -792,7 +795,7 @@
 }
 
 
-.secure_category .gutter {
+.deleted-topic .gutter, .read_restricted .gutter {
   position: relative;
   &:before {
     display: block;
@@ -801,6 +804,13 @@
     left: 0;
     color: rgba($black, 0.05);
     font: 90px/1 FontAwesome;
+    content: "\f05c";
+  }
+}
+
+
+.read_restricted .gutter {
+  &:before {
     content: "\f0c0";
   }
 }
