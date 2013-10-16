@@ -10,8 +10,16 @@ Discourse.TopicRoute = Discourse.Route.extend({
 
   redirect: function() { Discourse.redirectIfLoginRequired(this); },
 
-  events: {
+  actions: {
     // Modals that can pop up within a topic
+
+    showPosterExpansion: function(post) {
+      var self = this;
+
+      Discourse.User.findByUsername(post.get('username')).then(function (user) {
+        self.controllerFor('posterExpansion').show(user, post);
+      });
+    },
 
     showFlags: function(post) {
       Discourse.Route.showModal(this, 'flag', post);
@@ -71,7 +79,7 @@ Discourse.TopicRoute = Discourse.Route.extend({
     this._super();
 
     var topic = this.modelFor('topic');
-    Discourse.Session.current('lastTopicIdViewed', parseInt(topic.get('id'), 10));
+    Discourse.Session.currentProp('lastTopicIdViewed', parseInt(topic.get('id'), 10));
     this.controllerFor('search').set('searchContext', topic.get('searchContext'));
   },
 
@@ -80,15 +88,16 @@ Discourse.TopicRoute = Discourse.Route.extend({
 
     // Clear the search context
     this.controllerFor('search').set('searchContext', null);
+    this.controllerFor('posterExpansion').set('model', null);
 
-    var topicController = this.controllerFor('topic');
-    var postStream = topicController.get('postStream');
+    var topicController = this.controllerFor('topic'),
+        postStream = topicController.get('postStream');
     postStream.cancelFilter();
 
     topicController.set('multiSelect', false);
     topicController.unsubscribe();
     this.controllerFor('composer').set('topic', null);
-    Discourse.ScreenTrack.instance().stop();
+    Discourse.ScreenTrack.current().stop();
 
     var headerController;
     if (headerController = this.controllerFor('header')) {
@@ -101,7 +110,10 @@ Discourse.TopicRoute = Discourse.Route.extend({
   },
 
   setupController: function(controller, model) {
-    controller.set('model', model);
+    controller.setProperties({
+      model: model,
+      editingTopic: false
+    });
 
     this.controllerFor('header').setProperties({
       topic: model,
@@ -112,7 +124,7 @@ Discourse.TopicRoute = Discourse.Route.extend({
     controller.subscribe();
 
     // We reset screen tracking every time a topic is entered
-    Discourse.ScreenTrack.instance().start(model.get('id'));
+    Discourse.ScreenTrack.current().start(model.get('id'));
   }
 
 });

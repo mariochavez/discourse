@@ -386,7 +386,6 @@ fr:
     rails_env_warning: "Votre serveur fonctionne dans l'environnement de %{env}."
     host_names_warning: "Le fichier config/database.yml utilise le nom d'hôte par défaut. Veuillez renseigner votre nom d'hôte."
     gc_warning: "Votre serveur utilise les paramètres par défaut de collection du GC de ruby, ce qui ne vous donneras pas les meilleures performances. Merci de lire cette discussion sur <a href=\"http://meta.discourse.org/t/tuning-ruby-and-rails-for-discourse/4126\">l'optimisation des performances de Ruby et Rails pour Discourse [EN]</a>."
-    clockwork_warning: "Clockwork n'est pas lancé. Assurez-vous qu'un processus clockwork soit toujours lancé afin que les tâches importantes soient planifiées. <a href=\"https://github.com/tomykaira/clockwork\">En savoir plus sur clockwork [EN]</a>."
     sidekiq_warning: "Sidekiq n'est pas lancé. De nombreuses tâches, comme l'envoie d'e-mails, sont executées de manière asynchrome par sidekiq. Assurez-vous d'avoir au moins un processus sidekiq de lancé. <a href=\"https://github.com/mperham/sidekiq\">En savoir plus sur sidekiq [EN]</a>."
     queue_size_warning: "Il y a %{queue_size} tâches dans la file d'attente, ce qui est beaucoup. Cela peut provenir d'un problème avec les processus Sidekiq, ou à un manque de processus Sidekiq travailleurs."
     memory_warning: "Votre serveur dispose de moins de 1 Go de mémoire vive. Au moins 1 Go de RAM est recommandé."
@@ -447,6 +446,7 @@ fr:
     crawl_images: "permettre la récupération des images provenant de sources tierces"
     ninja_edit_window: "temps d'édition avant de sauvegarder une nouvelle version, en secondes."
     max_image_width: "largeur maximale des images d'un message"
+    max_image_height: "hauteur maximale des images d'un message"
     category_featured_topics: "nombre de discussions affichées dans la liste par catégories"
     add_rel_nofollow_to_user_content: "Ajouter rel nofollow à tous les contenus des utilisateurs, sauf les liens internes (incluant les domaines parents) Modifier ceci requiert une mise à jour de tout votre markdown (<code>rake posts:rebake</code>)"
     exclude_rel_nofollow_domains: "Une liste séparée par des virgules contenant les noms de domaines de premier niveau pour lesquels il faut ajouter un attribut nofollow (exemple.com va automatiquement fonctionner aussi avec sous.domaine.exemple.com)"
@@ -489,7 +489,7 @@ fr:
     track_external_right_clicks: "Suivi des clics sur les liens externes (ex: ouverture dans un nouvel onglet) désactivé par défaut car nécessite une ré-écrite de toutes les urls et nuit à l'accessibilité"
     topics_per_page: "Nombre de discussions à afficher sur la page de liste des discussions."
     posts_per_page: "Nombre de messages retournés sur une page de discussion"
-    system_username: "Pseudo qui envoie les messages automatiques"
+    site_contact_username: "Pseudo qui envoie les messages automatiques"
     send_welcome_message: "Les nouveaux utilisateurs reçoivent-ils un message privé de bienvenue ?"
     suppress_reply_directly_below: "Ne pas afficher les boutons de réponse sous un message lorsque la réponse est juste en dessous"
     allow_index_in_robots_txt: "Le site doit-être indexé par les moteurs de recherche (met à jour le fichier robots.txt)"
@@ -612,6 +612,8 @@ fr:
     pop3s_polling_password: "Le mot de passe pour le polling POPS3 par email"
 
     minimum_topics_similar: "Combien de topics ont besoin d'exister dans la base de données avant que des topics similaires soit présentés."
+
+    allow_uploaded_avatars: "Permet aux utilisateurs d'uploader leur propre avatar"
 
   notification_types:
     mentioned: "%{display_username} vous a mentionné dans %{link}"

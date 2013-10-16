@@ -1,4 +1,4 @@
-require_dependency 'jobs'
+require_dependency 'jobs/base'
 require_dependency 'pretty_text'
 require_dependency 'rate_limiter'
 require_dependency 'post_revisor'
@@ -35,7 +35,7 @@ class Post < ActiveRecord::Base
   validates_with ::Validators::PostValidator
 
   # We can pass several creating options to a post via attributes
-  attr_accessor :image_sizes, :quoted_post_numbers, :no_bump, :invalidate_oneboxes, :cooking_options
+  attr_accessor :image_sizes, :quoted_post_numbers, :no_bump, :invalidate_oneboxes, :cooking_options, :skip_unique_check
 
   SHORT_POST_CHARS = 1200
 
@@ -45,7 +45,6 @@ class Post < ActiveRecord::Base
   scope :public_posts, -> { joins(:topic).where('topics.archetype <> ?', Archetype.private_message) }
   scope :private_posts, -> { joins(:topic).where('topics.archetype = ?', Archetype.private_message) }
   scope :with_topic_subtype, ->(subtype) { joins(:topic).where('topics.subtype = ?', subtype) }
-  scope :without_nuked_users, -> { where(nuked_user: false) }
 
   def self.hidden_reasons
     @hidden_reasons ||= Enum.new(:flag_threshold_reached, :flag_threshold_reached_again, :new_user_spam_threshold_reached)
@@ -69,6 +68,16 @@ class Post < ActiveRecord::Base
   # The key we use in redis to ensure unique posts
   def unique_post_key
     "post-#{user_id}:#{raw_hash}"
+  end
+
+  def store_unique_post_key
+    if SiteSetting.unique_posts_mins > 0
+      $redis.setex(unique_post_key, SiteSetting.unique_posts_mins.minutes.to_i, "1")
+    end
+  end
+
+  def matches_recent_post?
+    $redis.exists(unique_post_key)
   end
 
   def raw_hash
@@ -275,7 +284,8 @@ class Post < ActiveRecord::Base
                           AND p2.user_id <> post_timings.user_id
                       GROUP BY post_timings.topic_id, post_timings.post_number) AS x
                 WHERE x.topic_id = posts.topic_id
-                  AND x.post_number = posts.post_number")
+                  AND x.post_number = posts.post_number
+                  AND (posts.avg_time <> (x.gmean / 1000)::int OR posts.avg_time IS NULL)")
     end
   end
 
@@ -383,7 +393,7 @@ end
 # Table name: posts
 #
 #  id                      :integer          not null, primary key
-#  user_id                 :integer          not null
+#  user_id                 :integer
 #  topic_id                :integer          not null
 #  post_number             :integer          not null
 #  raw                     :text             not null
@@ -419,7 +429,6 @@ end
 #  notify_user_count       :integer          default(0), not null
 #  like_score              :integer          default(0), not null
 #  deleted_by_id           :integer
-#  nuked_user              :boolean          default(FALSE)
 #
 # Indexes
 #

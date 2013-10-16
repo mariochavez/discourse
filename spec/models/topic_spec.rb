@@ -688,6 +688,10 @@ describe Topic do
       topic.moderator_posts_count.should == 0
     end
 
+    it "its user has a topics_count of 1" do
+      topic.user.created_topic_count.should == 1
+    end
+
     context 'post' do
       let(:post) { Fabricate(:post, topic: topic, user: topic.user) }
 
@@ -1000,7 +1004,9 @@ describe Topic do
 
       it "ignores the category's default auto-close" do
         Timecop.freeze(Time.zone.now) do
-          topic = Fabricate(:topic, category: Fabricate(:category, auto_close_days: 14))
+          mod = Fabricate(:moderator)
+          # NOTE, only moderators can auto-close, if missing system user is used
+          topic = Fabricate(:topic, category: Fabricate(:category, auto_close_days: 14), user: mod)
           Jobs.expects(:enqueue_at).with(12.hours.from_now, :close_topic, has_entries(topic_id: topic.id, user_id: topic.user_id))
           topic.auto_close_at = 12.hours.from_now
           topic.save.should be_true

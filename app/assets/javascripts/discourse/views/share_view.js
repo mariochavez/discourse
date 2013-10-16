@@ -13,8 +13,13 @@ Discourse.ShareView = Discourse.View.extend({
 
   title: function() {
     if (this.get('controller.type') === 'topic') return I18n.t('share.topic');
-    return I18n.t('share.post');
-  }.property('controller.type'),
+    var postNumber = this.get('controller.postNumber');
+    if (postNumber) {
+      return I18n.t('share.post', {postNumber: this.get('controller.postNumber')});
+    } else {
+      return I18n.t('share.topic');
+    }
+  }.property('controller.type', 'controller.postNumber'),
 
   hasLink: function() {
     if (this.present('controller.link')) return 'visible';
@@ -34,13 +39,13 @@ Discourse.ShareView = Discourse.View.extend({
   }.observes('controller.link'),
 
   didInsertElement: function() {
-
     var shareView = this;
     $('html').on('mousedown.outside-share-link', function(e) {
       // Use mousedown instead of click so this event is handled before routing occurs when a
       // link is clicked (which is a click event) while the share dialog is showing.
       if (shareView.$().has(e.target).length !== 0) { return; }
-      shareView.get('controller').close();
+
+      shareView.get('controller').send('close');
       return true;
     });
 
@@ -48,18 +53,30 @@ Discourse.ShareView = Discourse.View.extend({
       e.preventDefault();
       var $currentTarget = $(e.currentTarget);
       var url = $currentTarget.data('share-url');
+      var postNumber = $currentTarget.data('post-number');
       // Relative urls
 
       if (url.indexOf("/") === 0) {
         url = window.location.protocol + "//" + window.location.host + url;
       }
-      shareView.get('controller').shareLink(e, url);
+
+      var x = e.pageX - 150;
+      if (x < 25) {
+        x = 25;
+      }
+
+      $('#share-link').css({
+        left: "" + x + "px",
+        top: "" + (e.pageY - 100) + "px"
+      });
+      shareView.set('controller.link', url);
+      shareView.set('controller.postNumber', postNumber);
       return false;
     });
 
     $('html').on('keydown.share-view', function(e){
       if (e.keyCode === 27) {
-        shareView.get('controller').close();
+        shareView.get('controller').send('close');
       }
     });
   },

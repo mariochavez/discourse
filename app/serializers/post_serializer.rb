@@ -46,11 +46,11 @@ class PostSerializer < BasicPostSerializer
 
 
   def moderator?
-    object.user.moderator?
+    object.user.try(:moderator?) || false
   end
 
   def staff?
-    object.user.staff?
+    object.user.try(:staff?) || false
   end
 
   def yours
@@ -70,7 +70,7 @@ class PostSerializer < BasicPostSerializer
   end
 
   def display_username
-    object.user.name
+    object.user.try(:name)
   end
 
   def link_counts
@@ -101,17 +101,18 @@ class PostSerializer < BasicPostSerializer
   end
 
   def user_title
-    object.user.title
+    object.user.try(:title)
   end
 
   def trust_level
-    object.user.trust_level
+    object.user.try(:trust_level)
   end
 
   def reply_to_user
     {
       username: object.reply_to_user.username,
-      name: object.reply_to_user.name
+      name: object.reply_to_user.name,
+      avatar_template: object.reply_to_user.avatar_template
     }
   end
 
