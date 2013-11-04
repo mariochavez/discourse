@@ -13,9 +13,12 @@ class AdminDetailedUserSerializer < AdminUserSerializer
              :flags_received_count,
              :private_topics_count,
              :can_delete_all_posts,
-             :can_be_deleted
+             :can_be_deleted,
+             :ban_reason
 
   has_one :approved_by, serializer: BasicUserSerializer, embed: :objects
+  has_one :api_key, serializer: ApiKeySerializer, embed: :objects
+  has_one :banned_by, serializer: BasicUserSerializer, embed: :objects
 
   def can_revoke_admin
     scope.can_revoke_admin?(object)
@@ -47,6 +50,14 @@ class AdminDetailedUserSerializer < AdminUserSerializer
 
   def topic_count
     object.topics.count
+  end
+
+  def include_api_key?
+    api_key.present?
+  end
+
+  def banned_by
+    object.ban_record.try(:acting_user)
   end
 
 end

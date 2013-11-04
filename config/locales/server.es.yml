@@ -337,7 +337,7 @@ es:
     track_external_right_clicks: "Track external links that are right clicked (eg: open in new tab) disabled by default because it rewrites URLs"
     topics_per_page: "Cuantos topics son cargados por defecto en la página de lista de topics"
     posts_per_page: "Cuantos posts son devueltos en una página de topic"
-    system_username: "Nombre de usuario para el autor de mensajes privados enviados por el foro"
+    site_contact_username: "Nombre de usuario para el autor de mensajes privados enviados por el foro"
     send_welcome_message: "¿Reciben los nuevos usuarios un mensaje privado de bienvenida?"
     suppress_reply_directly_below: "No mostrar el contador de respuestas en un pot cuando una única respuesta directamente debajo"
     allow_index_in_robots_txt: "Permitir que el sitio sea indexado por motores de búsqueda (sobreescribe robots.txt)"
@@ -373,7 +373,6 @@ es:
     active_user_rate_limit_secs: "Como de frecuentemente actualizaremos el campo 'last_seen_at', en segundos"
     previous_visit_timeout_hours: "Cuanto tiempo debe pasar antes de que una visita sea considerada la 'visita previa', en horas"
 
-    uncategorized_name: "La categoría por defecto para los topics que no tienen categoría en la página /categories"
     max_mentions_per_post: "Maximo número de notificaciones @name que se pueden usar en un post"
 
     rate_limit_create_topic: "Cuantos segundos, después de crear un topic, deben pasar antes de poder crear otro topic"
