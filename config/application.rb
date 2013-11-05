@@ -51,6 +51,7 @@ module Discourse
     config.assets.paths += %W(#{config.root}/config/locales)
 
     config.assets.precompile += ['common.css', 'desktop.css', 'mobile.css', 'admin.js', 'admin.css', 'shiny/shiny.css', 'preload_store.js']
+    config.assets.initialize_on_precompile = false
 
     # Precompile all defer
     Dir.glob("#{config.root}/app/assets/javascripts/defer/*.js").each do |file|
