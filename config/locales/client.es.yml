@@ -797,16 +797,31 @@ es:
 
     admin:
       title: 'Administrador'
+      moderator: 'Moderador'
 
       dashboard:
         title: "Panel"
-        welcome: "Bienvenido a la sección de administración."
+        last_updated: "Panel actualizado el:"
         version: "Versión instalada"
         up_to_date: "Está ejecutando la última versión de Discourse."
         critical_available: "Actualización crítica disponible."
         updates_available: "Hay actualizaciones disponibles."
         please_upgrade: "Por favor actualice!"
+        no_check_performed: "La revisión por actualizaciones no se ha realizado. Asegurese que sidekiq está activo."
+        stale_data: "La revisión por actualizaciones no se ha realizado. Asegurese que sidekiq está activo."
+        version_check_pending: "Parece que cuenta con la última actualización. Fantástico!"
+        installed_version: "Instalada"
         latest_version: "Última versión"
+        problems_found: "Se han encontrado problemas en su instalación de Discourse:"
+        last_checked: "Última verificación"
+        refresh_problems: "Refrescar"
+        no_problems: "No se encontró problema alguno."
+        moderators: "Moderadores:"
+        admins: "Administradores:"
+        blocked: "Bloqueado:"
+        banned: "Vetado:"
+        private_messages_short: "MPs"
+        private_messages_title: "Mensajes provados"
 
         reports:
           today: "Hoy"
