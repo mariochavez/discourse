@@ -37,6 +37,7 @@ h1 .topic-statuses .topic-status i {margin-right: 5px;}
   border: 1px solid #ddd;
   font-size: 12px;
   margin-left: -8px;
+  background: #fff;
 }
 
 .avoid-tab {
@@ -210,10 +211,6 @@ a.star {
   text-shadow: none !important;
 }
 
-.profiler-results {
-  display: none;
-}
-
 .topic-summary {
   margin: 20px 0 0 0;
   border: 1px solid #ddd;
@@ -350,7 +347,7 @@ a.star {
 }
 
 #topic-footer-buttons {
-  padding: 20px 10px 0 10px;
+  padding: 10px 10px 0 10px;
   p {
     line-height: 32px;
     color: #888;
@@ -389,21 +386,6 @@ span.post-count {
     margin-right: 10px;
     .icon-star {margin-right: 5px;}
   }
-}
-
-#topic-title {
-  z-index: 1000;
-  padding: 14px 0 8px 0;
-  h1 {
-    line-height: 1.2em;
-    overflow: hidden;
-  }
-  .topic-statuses {
-    margin-top: -2px;
-    .icon-pushpin {margin-top: -1px;}
-  }
-  .star {font-size: 20px; margin-top: 8px;}
-  .chzn-container {vertical-align: middle;}
 }
 
 article.boxed {
@@ -497,12 +479,11 @@ iframe {
 }
 
 .contents .cooked {
-  padding-right: 30px;
+  margin-right: 50px;
+  word-wrap: break-word;
   h1, h2, h3 {margin: 10px 0;}
-  ul, ol {margin: 0 15px;}
+  ul, ol {margin: 15px 0 0 20px;}
   li p {margin: 3px 0;}
-
-
 }
 
   a.mention {
@@ -612,13 +593,30 @@ position: relative;
 blockquote { /* solo quotes */
   margin: 14px 0;
   padding: 12px;
+    p:first-of-type {margin-top: 0;}
+    p:last-of-type {margin-bottom: 0;}
 }
 
 .quote { /* quotes with attribution */
   margin-top: 14px;
-  .title {margin-right: 0;}
-  blockquote {margin: 0;}
+  blockquote {margin-top: 0; padding-top: 0;
+  .onebox-result {background-color: #ddd;}
+
+  
+  }
+
+  .title {
+  border-left: 5px solid #bebebe;
+  background-color: #f1f1f1;
+  padding: 12px;
+  .avatar { margin-right: 7px; }
+  img {margin-top: -4px;}
+
 }
+}
+
+
+
 
 .quote-controls {
   float: right;
@@ -643,13 +641,7 @@ blockquote { /* solo quotes */
     }
 }
 
-.quote .title {
-  border-left: 5px solid #bebebe;
-  background-color: #f1f1f1;
-  padding: 10px 10px 0 12px;
-  .avatar { margin-right: 7px; }
-  img {margin-top: -4px;}
-}
+
 
 .gutter {
   float: left;
@@ -683,6 +675,19 @@ blockquote { /* solo quotes */
   position: relative;
   width: 720px;
   padding: 10px 10px 15px 20px;
+
+.highlighted {
+  background-color: lighten(yellow, 45%) !important;
+        }
+
+}
+
+
+.bottom-round.contents.regular {
+
+ -webkit-transition: background-color .25s linear;
+ transition: background-color .25s linear;
+
 }
 
 .posts-wrapper {
@@ -693,7 +698,7 @@ blockquote { /* solo quotes */
 
 .span14 { width: 70%; max-width: 720px; } //main content
 .span2 {max-width: 92px;}
-.span11 {width: 90%; max-width: 580px;}
+.span11 {width: 80%; max-width: 580px;}
 .span5 {max-width: 250px;}
 
 
@@ -906,7 +911,7 @@ clear: both;
   }
  article.boxed {
     position: relative;
-    line-height: 20px;
+    line-height: 21px;
 
     .select-posts {
       position: absolute;
@@ -935,6 +940,24 @@ a.attachment:before {
   content: "\f019";
 }
 
+.private_message .gutter, .deleted-topic .gutter,.read_restricted .gutter {
+    position: relative;
+}
 
+.private_message .gutter:before, .deleted-topic .gutter:before, .read_restricted .gutter:before {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 10px;
+    color: rgba(0,0,0,0.05);
+    font: 90px/1 FontAwesome;
+    content: "\f05c";
+}
 
+.read_restricted .gutter:before {
+    content: "\f0c0";
+}
 
+.private_message .gutter:before {
+    content: "\f0e0";
+}

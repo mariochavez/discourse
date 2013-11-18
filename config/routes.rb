@@ -21,7 +21,11 @@ Discourse::Application.routes.draw do
   namespace :admin, constraints: StaffConstraint.new do
     get '' => 'admin#index'
 
-    resources :site_settings, constraints: AdminConstraint.new
+    resources :site_settings, constraints: AdminConstraint.new do
+      collection do
+        get 'category/:id' => 'site_settings#index'
+      end
+    end
 
     get 'reports/:type' => 'reports#show'
 
@@ -38,9 +42,9 @@ Discourse::Application.routes.draw do
         put 'approve-bulk' => 'users#approve_bulk'
         delete 'reject-bulk' => 'users#reject_bulk'
       end
-      put 'ban'
+      put 'suspend'
       put 'delete_all_posts'
-      put 'unban'
+      put 'unsuspend'
       put 'revoke_admin', constraints: AdminConstraint.new
       put 'grant_admin', constraints: AdminConstraint.new
       post 'generate_api_key', constraints: AdminConstraint.new
@@ -96,7 +100,7 @@ Discourse::Application.routes.draw do
         delete 'key' => 'api#revoke_key'
       end
     end
-  end
+  end # admin namespace
 
   get 'email_preferences' => 'email#preferences_redirect', :as => 'email_preferences_redirect'
   get 'email/unsubscribe/:key' => 'email#unsubscribe', as: 'email_unsubscribe'
