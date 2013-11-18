@@ -78,12 +78,15 @@ td {border-bottom: 1px solid #ddd; border-top: 1px solid #ddd;}
   };
 }
 
+.admin-container {
+  margin-top: 20px;
+}
+
 .admin-controls {
   @include border-radius-all(5px);
   background-color: darken($white, 5%);
   border: 1px solid darken($white, 10%);
   padding: 10px 10px 3px 0px;
-  margin-bottom: 20px;
   height: 35px;
   .nav.nav-pills {
     li.active {
@@ -143,9 +146,54 @@ td {border-bottom: 1px solid #ddd; border-top: 1px solid #ddd;}
   }
 }
 
+.site-settings-nav {
+  width: 200px;
+  margin-top: 40px;
+  .nav-stacked {
+    border-right: none;
+  }
+  li a.active {
+    color: $white;
+    background-color: $nav-stacked-background-color-active;
+  }
+}
+
+.site-settings-detail {
+  width: 850px;
+  @include medium-width { width: 740px; }
+  @include small-width  { width: 700px; }
+  margin-left: 0;
+  border-left: solid 1px lighten($nav-stacked-border-color, 5%);
+  padding: 30px 0 30px 30px;
+}
+
 .settings {
   .setting {
     padding-bottom: 20px;
+
+    .setting-label {
+      float: left;
+      width: 196px;
+      @include medium-width { width: 176px; }
+      @include small-width  { width: 166px; }
+      margin-right: 12px;
+    }
+    .setting-value {
+      float: left;
+      width: 450px;
+      @include medium-width { width: 360px; }
+      @include small-width  { width: 330px; }
+    }
+    .setting-controls {
+      float: left;
+      width: 144px;
+    }
+    .input-setting-string {
+      width: 404px;
+      @include medium-width { width: 314px; }
+      @include small-width  { width: 284px; }
+    }
+
     .desc {
       padding-top: 3px;
       color: darken($white, 40%);
@@ -195,11 +243,13 @@ table {
 }
 
 .display-row {
-  height: 30px;
   line-height: 30px;
   padding: 5px;
   &:nth-of-type(1) {
     border-top: 0;
+  }
+  &.highlight-danger {
+    background-color: #ffe5e5;
   }
   border-top: 1px solid #dddddd;
   &:before, &:after {
@@ -232,6 +282,9 @@ table {
   }
 
   .controls {
+    width: 600px;
+    float: left;
+    margin-left: 12px;
     .btn {
       margin-right: 5px;
     }

@@ -826,12 +826,12 @@ describe User do
     end
   end
 
-  describe "#update_avatar" do
+  describe "#upload_avatar" do
     let(:upload) { Fabricate(:upload) }
     let(:user)   { Fabricate(:user) }
 
-    it "should update use's avatar" do
-      expect(user.update_avatar(upload)).to be_true
+    it "should update user's avatar" do
+      expect(user.upload_avatar(upload)).to be_true
     end
   end
 
@@ -883,6 +883,27 @@ describe User do
 
     end
 
+  end
+
+  describe "#find_email" do
+
+    let(:user) { Fabricate(:user, email: "bob@example.com") }
+
+    context "when email is exists in the email logs" do
+      before { user.stubs(:last_sent_email_address).returns("bob@lastemail.com") }
+
+      it "returns email from the logs" do
+        expect(user.find_email).to eq("bob@lastemail.com")
+      end
+    end
+
+    context "when email does not exist in the email logs" do
+      before { user.stubs(:last_sent_email_address).returns(nil) }
+
+      it "fetches the user's email" do
+        expect(user.find_email).to eq(user.email)
+      end
+    end
   end
 
 end
