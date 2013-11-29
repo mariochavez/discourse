@@ -162,6 +162,7 @@ td {border-bottom: 1px solid #ddd; border-top: 1px solid #ddd;}
   width: 850px;
   @include medium-width { width: 740px; }
   @include small-width  { width: 700px; }
+  min-height: 800px;
   margin-left: 0;
   border-left: solid 1px lighten($nav-stacked-border-color, 5%);
   padding: 30px 0 30px 30px;
@@ -355,7 +356,7 @@ table {
   tr.hidden-post td.excerpt { opacity: 0.4;  }
   tr.deleted td.excerpt { opacity: 0.8; background-color: #ffcece; }
   td.message {
-    padding: 4px 0;
+    padding: 4px 8px;
     background-color: #f8f8e0;
   }
   td { vertical-align: top; }
@@ -562,6 +563,9 @@ table.api-keys {
       }
       .actions {
         text-align: right;
+      }
+      .btn {
+        background-color: #ccc;
       }
     }
   }

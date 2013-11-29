@@ -36,15 +36,15 @@ Discourse.Category = Discourse.Model.extend({
   }.property('name'),
 
   unreadUrl: function() {
-    return this.get('url') + '/unread';
+    return this.get('url') + '/l/unread';
   }.property('url'),
 
   newUrl: function() {
-    return this.get('url') + '/new';
+    return this.get('url') + '/l/new';
   }.property('url'),
 
   style: function() {
-    return "background-color: #" + (this.get('category.color')) + "; color: #" + (this.get('category.text_color')) + ";";
+    return "background-color: #" + this.get('category.color') + "; color: #" + (this.get('category.text_color')) + ";";
   }.property('color', 'text_color'),
 
   moreTopics: function() {
@@ -114,13 +114,17 @@ Discourse.Category = Discourse.Model.extend({
     return this.get("topics")[0];
   }.property("topics"),
 
+  topicTrackingState: function(){
+    return Discourse.TopicTrackingState.current();
+  }.property(),
+
   unreadTopics: function(){
-    return Discourse.TopicTrackingState.current().countUnread(this.get('name'));
-  }.property('Discourse.TopicTrackingState.current.messageCount'),
+    return this.get('topicTrackingState').countUnread(this.get('name'));
+  }.property('topicTrackingState.messageCount'),
 
   newTopics: function(){
-    return Discourse.TopicTrackingState.current().countNew(this.get('name'));
-  }.property('Discourse.TopicTrackingState.current.messageCount')
+    return this.get('topicTrackingState').countNew(this.get('name'));
+  }.property('topicTrackingState.messageCount')
 
 });
 

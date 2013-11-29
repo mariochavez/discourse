@@ -440,6 +440,7 @@ en:
     access_password_removal: "Your site was using the access_password setting, which has been removed. The login_required and must_approve_users settings have been enabled, which should be used instead. You can change them in the <a href='/admin/site_settings'>Site Settings</a>. Be sure to <a href='/admin/users/list/pending'>approve users in the Pending Users list</a>. (This message will go away after 2 days.)"
     site_contact_username_warning: "The site_contact_username setting is blank. Please update it in the <a href='/admin/site_settings'>Site Settings</a>. Set it to the username of an admin user who should be the sender of system messages."
     notification_email_warning: "The notification_email setting is blank. Please update it in the <a href='/admin/site_settings'>Site Settings</a>."
+    enforce_global_nicknames_warning: "The enforce_global_nicknames setting is checked, but the discourse_org_access_key is blank. A Discourse.org access key is required to use the enforce_global_nicknames setting. Please update your <a href='/admin/site_settings'>Site Settings</a>."
 
   content_types:
     education_new_reply:
@@ -476,6 +477,12 @@ en:
     login_required:
       title: "Login Required: Homepage"
       description: "The text displayed for unauthorized users when login is required on the site."
+    top:
+      title: "Top of the pages"
+      description: "HTML that will be added at the top of every pages (after the header, before the navigation or the topic title)"
+    bottom:
+      title: "Bottom of the pages"
+      description: "HTML that will be added at the bottom of every pages"
 
   site_settings:
     default_locale: "The default language of this Discourse instance (ISO 639-1 Code)"
@@ -524,10 +531,10 @@ en:
     notification_email: "The return email address used when sending system emails such as notifying users of lost passwords, new accounts etc"
     email_custom_headers: "A pipe-delimited list of custom email headers"
     use_ssl: "Should the site be accessible via SSL? (NOT IMPLEMENTED, EXPERIMENTAL)"
-    best_of_score_threshold: "The minimum score of a post to be included in the 'best of'"
-    best_of_posts_required: "Minimum posts in a topic before 'best of' mode is enabled"
-    best_of_likes_required: "Minimum likes in a topic before the 'best of' mode will be enabled"
-    best_of_percent_filter: "When a user clicks best of, show the top % of posts"
+    summary_score_threshold: "The minimum score of a post to be included in the 'summary'"
+    summary_posts_required: "Minimum posts in a topic before 'summary' mode is enabled"
+    summary_likes_required: "Minimum likes in a topic before the 'summary' mode will be enabled"
+    summary_percent_filter: "When a user clicks summary, show the top % of posts"
     enable_private_messages: "Allow basic (1) trust level users to create private messages and reply to private messages"
 
     enable_long_polling: "Message bus used for notification can use long polling"
@@ -626,7 +633,8 @@ en:
     suggested_topics: "Number of suggested topics shown at the bottom of a topic"
 
     clean_up_uploads: "Remove orphaned uploads to prevent illegal hosting. WARNING: you might want to make a backup of your /uploads directory before enabled this setting."
-    uploads_grace_period_in_hours: "Grace period (in hours) before an orphan upload is removed."
+    clean_orphan_uploads_grace_period_hours: "Grace period (in hours) before an orphan upload is removed."
+    purge_deleted_uploads_grace_period_days: "Grace period (in days) before a deleted upload is erased."
     enable_s3_uploads: "Place uploads on Amazon S3"
     s3_upload_bucket: "The Amazon S3 bucket name that files will be uploaded into. WARNING: must be lowercase (cf. http://docs.aws.amazon.com/AmazonS3/latest/dev/BucketRestrictions.html)"
     s3_access_key_id: "The Amazon S3 access key id that will be used to upload images"
@@ -1036,7 +1044,7 @@ en:
       text_body_template: |
         There are new user signups waiting to be approved (or rejected) before they can access this forum.
 
-        [Please review them in the admin section](/admin/users/list/pending).
+        [Please review them in the admin section](%{base_url}/admin/users/list/pending).
 
   unsubscribe_link: "To unsubscribe from these emails, visit your [user preferences](%{user_preferences_url})."
 
@@ -1178,7 +1186,7 @@ en:
   deleted: 'deleted'
 
   upload:
-    edit_reason: "We have downloaded a copy of the remotes images"
+    edit_reason: "We have downloaded copies of the remote images"
     unauthorized: "Sorry, the file you are trying to upload is not authorized (authorized extensions: %{authorized_extensions})."
     pasted_image_filename: "Pasted image"
     attachments:

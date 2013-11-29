@@ -56,7 +56,6 @@ module Discourse
     end]
 
     config.assets.precompile += ['common.css', 'desktop.css', 'mobile.css', 'admin.js', 'admin.css', 'shiny/shiny.css', 'preload_store.js']
-    config.assets.initialize_on_precompile = false
 
 
     # Precompile all defer
@@ -81,9 +80,8 @@ module Discourse
     # Run "rake -D time" for a list of tasks for finding time zone names. Default is UTC.
     config.time_zone = 'Central Time (US & Canada)'
 
-    # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
-    # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
-    # config.i18n.default_locale = :de
+    # auto-load server locale in plugins
+    config.i18n.load_path += Dir["#{Rails.root}/plugins/*/config/locales/server.*.yml"]
 
     # Configure the default encoding used in templates for Ruby 1.9.
     config.encoding = 'utf-8'
@@ -153,6 +151,10 @@ module Discourse
     # XML params, we see errors in our logs about malformed XML and there
     # absolutly no spot in our app were we use XML as opposed to JSON endpoints
     ActionDispatch::ParamsParser::DEFAULT_PARSERS.delete(Mime::XML)
+
+    if ENV['RBTRACE'] == "1"
+      require 'rbtrace'
+    end
 
   end
 end

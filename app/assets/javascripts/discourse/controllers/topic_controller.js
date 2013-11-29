@@ -8,7 +8,6 @@
 **/
 Discourse.TopicController = Discourse.ObjectController.extend(Discourse.SelectedPostsCount, {
   multiSelect: false,
-  summaryCollapsed: true,
   needs: ['header', 'modal', 'composer', 'quoteButton'],
   allPostsSelected: false,
   editingTopic: false,
@@ -28,10 +27,6 @@ Discourse.TopicController = Discourse.ObjectController.extend(Discourse.Selected
 
     jumpBottom: function() {
       Discourse.URL.routeTo(this.get('lastPostUrl'));
-    },
-
-    toggleSummary: function() {
-      this.toggleProperty('summaryCollapsed');
     },
 
     selectAll: function() {
@@ -184,7 +179,6 @@ Discourse.TopicController = Discourse.ObjectController.extend(Discourse.Selected
       this.get('content').toggleStar();
     },
 
-
     /**
       Clears the pin from a topic for the currently logged in user
 
@@ -206,13 +200,13 @@ Discourse.TopicController = Discourse.ObjectController.extend(Discourse.Selected
     },
 
     replyAsNewTopic: function(post) {
-      var composerController = this.get('controllers.composer');
-      var promise = composerController.open({
-        action: Discourse.Composer.CREATE_TOPIC,
-        draftKey: Discourse.Composer.REPLY_AS_NEW_TOPIC_KEY
-      });
-      var postUrl = "" + location.protocol + "//" + location.host + (post.get('url'));
-      var postLink = "[" + (this.get('title')) + "](" + postUrl + ")";
+      var composerController = this.get('controllers.composer'),
+          promise = composerController.open({
+            action: Discourse.Composer.CREATE_TOPIC,
+            draftKey: Discourse.Composer.REPLY_AS_NEW_TOPIC_KEY
+          }),
+          postUrl = "" + location.protocol + "//" + location.host + (post.get('url')),
+          postLink = "[" + (this.get('title')) + "](" + postUrl + ")";
 
       promise.then(function() {
         Discourse.Post.loadQuote(post.get('id')).then(function(q) {
@@ -222,6 +216,7 @@ Discourse.TopicController = Discourse.ObjectController.extend(Discourse.Selected
         });
       });
     }
+
   },
 
   jumpTopDisabled: function() {
@@ -414,15 +409,6 @@ Discourse.TopicController = Discourse.ObjectController.extend(Discourse.Selected
     return false;
   },
 
-  clearFlags: function(actionType) {
-    actionType.clearFlags();
-  },
-
-  // Who acted on a particular post / action type
-  whoActed: function(actionType) {
-    actionType.loadUsers();
-  },
-
   recoverPost: function(post) {
     post.recover();
   },
@@ -475,19 +461,65 @@ Discourse.TopicController = Discourse.ObjectController.extend(Discourse.Selected
     }
   },
 
-  removeAllowedUser: function(username) {
-    var self = this;
-    bootbox.dialog(I18n.t("private_message_info.remove_allowed_user", {name: username}), [
-      {label: I18n.t("no_value"),
-       'class': 'btn-danger rightg'},
-      {label: I18n.t("yes_value"),
-       'class': 'btn-primary',
-        callback: function() {
-          self.get('details').removeAllowedUser(username);
+  // If our current post is changed, notify the router
+  _currentPostChanged: function() {
+    var currentPost = this.get('currentPost');
+    if (currentPost) {
+      this.send('postChangedRoute', currentPost);
+    }
+  }.observes('currentPost'),
+
+  sawObjects: function(posts) {
+    if (posts) {
+      var self = this,
+          lastReadPostNumber = this.get('last_read_post_number');
+
+      posts.forEach(function(post) {
+        var postNumber = post.get('post_number');
+        if (postNumber > lastReadPostNumber) {
+          lastReadPostNumber = postNumber;
         }
-      }
-    ]);
+        post.set('read', true);
+      });
+      self.set('last_read_post_number', lastReadPostNumber);
+
+    }
+  },
+
+  topVisibleChanged: function(post) {
+    var postStream = this.get('postStream'),
+        firstLoadedPost = postStream.get('firstLoadedPost');
+
+    this.set('currentPost', post.get('post_number'));
+
+    if (firstLoadedPost && firstLoadedPost === post) {
+      // Note: jQuery shouldn't be done in a controller, but how else can we
+      // trigger a scroll after a promise resolves in a controller? We need
+      // to do this to preserve upwards infinte scrolling.
+      var $body = $('body'),
+          $elem = $('#post-cloak-' + post.get('post_number')),
+          distToElement = $body.scrollTop() - $elem.position().top;
+
+      postStream.prependMore().then(function() {
+        Em.run.next(function () {
+          $elem = $('#post-cloak-' + post.get('post_number'));
+          $('html, body').scrollTop($elem.position().top + distToElement);
+        });
+      });
+    }
+  },
+
+  bottomVisibleChanged: function(post) {
+    this.set('progressPosition', post.get('post_number'));
+
+    var postStream = this.get('postStream'),
+        lastLoadedPost = postStream.get('lastLoadedPost');
+
+    if (lastLoadedPost && lastLoadedPost === post) {
+      postStream.appendMore();
+    }
   }
+
 
 });
 

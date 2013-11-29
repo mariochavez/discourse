@@ -105,7 +105,7 @@ users:
   enable_persona_logins:
     client: true
     default: false
-  enforce_global_nicknames: true
+  enforce_global_nicknames: false
   discourse_org_access_key: ''
   invite_expiry_days: 14
   username_change_period: 3
@@ -233,7 +233,8 @@ files:
     default: 500
   create_thumbnails: true
   clean_up_uploads: false
-  uploads_grace_period_in_hours: 1
+  clean_orphan_uploads_grace_period_hours: 1
+  purge_deleted_uploads_grace_period_days: 30
   enable_s3_uploads: false
   s3_access_key_id: ''
   s3_secret_access_key: ''
@@ -371,10 +372,10 @@ uncategorized:
   active_user_rate_limit_secs: 60
   previous_visit_timeout_hours: 1
   staff_like_weight: 3
-  best_of_score_threshold: 15
-  best_of_posts_required: 50
-  best_of_likes_required: 1
-  best_of_percent_filter: 20
+  summary_score_threshold: 15
+  summary_posts_required: 50
+  summary_likes_required: 1
+  summary_percent_filter: 20
   send_welcome_message: true
   allow_import: false
   educate_until_posts:
