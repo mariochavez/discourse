@@ -1,3 +1,5 @@
+require 'openid_redis_store'
+
 class Auth::OpenIdAuthenticator < Auth::Authenticator
 
   attr_reader :name, :identifier
