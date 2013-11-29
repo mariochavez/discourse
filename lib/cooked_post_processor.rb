@@ -2,9 +2,11 @@
 # For example, inserting the onebox content, or image sizes/thumbnails.
 
 require_dependency "oneboxer"
+require_dependency 'url_helper'
 
 class CookedPostProcessor
   include ActionView::Helpers::NumberHelper
+  include UrlHelper
 
   def initialize(post, opts={})
     @dirty = false
@@ -14,12 +16,12 @@ class CookedPostProcessor
     @size_cache = {}
   end
 
-  def post_process
+  def post_process(bypass_bump = false)
     keep_reverse_index_up_to_date
     post_process_images
     post_process_oneboxes
     optimize_urls
-    pull_hotlinked_images
+    pull_hotlinked_images(bypass_bump)
   end
 
   def keep_reverse_index_up_to_date
@@ -68,9 +70,20 @@ class CookedPostProcessor
   end
 
   def limit_size!(img)
-    w, h = get_size_from_image_sizes(img["src"], @opts[:image_sizes]) || get_size(img["src"])
+    # retrieve the size from
+    #  1) the width/height attributes
+    #  2) the dimension from the preview (image_sizes)
+    #  3) the dimension of the original image (HTTP request)
+    w, h = get_size_from_attributes(img) ||
+           get_size_from_image_sizes(img["src"], @opts[:image_sizes]) ||
+           get_size(img["src"])
     # limit the size of the thumbnail
     img["width"], img["height"] = ImageSizer.resize(w, h)
+  end
+
+  def get_size_from_attributes(img)
+    w, h = img["width"].to_i, img["height"].to_i
+    return [w, h] if w > 0 && h > 0
   end
 
   def get_size_from_image_sizes(src, image_sizes)
@@ -124,10 +137,11 @@ class CookedPostProcessor
   def is_a_hyperlink?(img)
     parent = img.parent
     while parent
-      return if parent.name == "a"
+      return true if parent.name == "a"
       break unless parent.respond_to? :parent
       parent = parent.parent
     end
+    false
   end
 
   def add_lightbox!(img, original_width, original_height, upload=nil)
@@ -206,19 +220,8 @@ class CookedPostProcessor
     end
   end
 
-  def is_local(url)
-    Discourse.store.has_been_uploaded?(url) || url =~ /^\/assets\//
-  end
 
-  def absolute(url)
-    url =~ /^\/[^\/]/ ? (Discourse.asset_host || Discourse.base_url_no_prefix) + url : url
-  end
-
-  def schemaless(url)
-    url.gsub(/^https?:/, "")
-  end
-
-  def pull_hotlinked_images
+  def pull_hotlinked_images(bypass_bump = false)
     # is the job enabled?
     return unless SiteSetting.download_remote_images_to_local?
     # have we enough disk space?
@@ -229,7 +232,7 @@ class CookedPostProcessor
     Jobs.cancel_scheduled_job(:pull_hotlinked_images, post_id: @post.id)
     # schedule the job
     delay = SiteSetting.ninja_edit_window + 1
-    Jobs.enqueue_in(delay.seconds.to_i, :pull_hotlinked_images, post_id: @post.id)
+    Jobs.enqueue_in(delay.seconds.to_i, :pull_hotlinked_images, post_id: @post.id, bypass_bump: bypass_bump)
   end
 
   def disable_if_low_on_disk_space

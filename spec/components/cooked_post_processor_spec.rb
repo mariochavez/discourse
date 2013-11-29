@@ -42,12 +42,20 @@ describe CookedPostProcessor do
 
     context "with image_sizes" do
 
-      let(:post) { build(:post_with_image_url) }
+      let(:post) { build(:post_with_image_urls) }
       let(:cpp) { CookedPostProcessor.new(post, image_sizes: {"http://foo.bar/image.png" => {"width" => 111, "height" => 222}}) }
 
+      before { cpp.post_process_images }
+
+      it "adds the width from the image sizes provided when no dimension is provided" do
+        cpp.html.should =~ /src="http:\/\/foo.bar\/image.png" width="111" height="222"/
+      end
+
       it "adds the width from the image sizes provided" do
-        cpp.post_process_images
-        cpp.html.should =~ /width=\"111\"/
+        cpp.html.should =~ /src="http:\/\/domain.com\/picture.jpg" width="50" height="42"/
+      end
+
+      it "should be dirty" do
         cpp.should be_dirty
       end
 
@@ -308,7 +316,7 @@ describe CookedPostProcessor do
           Jobs.expects(:cancel_scheduled_job).with(:pull_hotlinked_images, post_id: post.id).once
 
           delay = SiteSetting.ninja_edit_window + 1
-          Jobs.expects(:enqueue_in).with(delay.seconds, :pull_hotlinked_images, post_id: post.id).once
+          Jobs.expects(:enqueue_in).with(delay.seconds, :pull_hotlinked_images, post_id: post.id, bypass_bump: false).once
 
           cpp.pull_hotlinked_images
         end
@@ -336,6 +344,24 @@ describe CookedPostProcessor do
       SiteSetting.expects(:download_remote_images_threshold).returns(75)
       cpp.disable_if_low_on_disk_space.should == true
       SiteSetting.download_remote_images_to_local.should == false
+    end
+
+  end
+
+  context ".is_a_hyperlink?" do
+
+    let(:post) { build(:post) }
+    let(:cpp) { CookedPostProcessor.new(post) }
+    let(:doc) { Nokogiri::HTML::fragment('<body><div><a><img id="linked_image"></a><p><img id="standard_image"></p></div></body>') }
+
+    it "is true when the image is inside a link" do
+      img = doc.css("img#linked_image").first
+      cpp.is_a_hyperlink?(img).should be_true
+    end
+
+    it "is false when the image is not inside a link" do
+      img = doc.css("img#standard_image").first
+      cpp.is_a_hyperlink?(img).should be_false
     end
 
   end
