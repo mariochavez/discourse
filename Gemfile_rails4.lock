@@ -195,7 +195,7 @@ GEM
     html_truncator (0.3.1)
       nokogiri (~> 1.5)
     httpauth (0.2.0)
-    i18n (0.6.7)
+    i18n (0.6.8)
     ice_cube (0.11.1)
     image_optim (0.9.1)
       exifr (~> 1.1.3)
