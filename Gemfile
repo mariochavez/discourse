@@ -56,6 +56,7 @@ end
 
 gem 'hiredis'
 gem 'redis', :require => ["redis", "redis/connection/hiredis"]
+gem 'openid-redis-store'
 gem 'dalli'
 
 gem 'active_model_serializers'
