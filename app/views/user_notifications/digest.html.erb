@@ -13,7 +13,7 @@
       <h3><%=t 'user_notifications.digest.top_topics' %></h3>
 
       <%- @featured_topics.each_with_index do |t, i| %>
-        <%= link_to t.title, t.relative_url %>
+        <%= link_to t.title, "#{Discourse.base_url}#{t.relative_url}" %>
 
         <%- if t.best_post.present? %>
           <div class='digest-post'>
@@ -31,7 +31,13 @@
 
       <%- @new_topics.each do |t| %>
         <ul>
-          <li><%= link_to t.title, t.relative_url %> <%- if t.category %>[<%= t.category.name %>]<%- end %></li>
+          <li>
+            <%= link_to t.title, "#{Discourse.base_url}#{t.relative_url}" %>
+
+            <span class='post-count'><%= t('user_notifications.digest.posts', count: t.posts_count) %></span>
+
+            <%- if t.category %><span style='background-color: #<%= t.category.color %>; color: #<%= t.category.text_color %>; font-size: 12px; padding: 4px 6px; font-weight: bold'><%= t.category.name %></span><%- end %>
+          </li>
         </ul>
       <%- end -%>
 
@@ -40,7 +46,7 @@
   <span class='footer-notice'>
     <%=raw(t :'user_notifications.digest.unsubscribe',
        site_link: html_site_link,
-       unsubscribe_link: link_to(t('user_notifications.digest.click_here'), email_unsubscribe_path(key: @user.temporary_key)))  %>
+       unsubscribe_link: link_to(t('user_notifications.digest.click_here'), email_unsubscribe_path(host: Discourse.base_url, key: @user.temporary_key, only_path: false)))  %>
   </span>
   </td>
 </tr>
