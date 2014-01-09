@@ -1,6 +1,24 @@
 @import "common/foundation/variables";
 @import "common/foundation/mixins";
+@import "common/foundation/helpers";
 
+.gap {
+  background-color: #f9f9f9;
+  padding: 5px 10px;
+  margin-bottom: 10px;
+  color: #999;
+  cursor: pointer;
+  text-align: center;
+  width: 820px;
+
+  &:hover {
+    background-color: #eee;
+  }
+
+  @include medium-width {
+    width: 800px;
+  }
+}
 
 .container {
   @extend .clearfix;
@@ -333,7 +351,7 @@ a.star {
         border-bottom: 0;
         padding-bottom: 1px;
       }
-      .icon {
+      .fa {
         margin: 0;
         font-size: 18px;
         line-height: 52px;
@@ -380,7 +398,7 @@ span.post-count {
   .btn {
     margin-bottom: 5px;
     margin-right: 10px;
-    .icon-star {margin-right: 5px;}
+    .fa-star {margin-right: 5px;}
   }
 }
 
@@ -552,6 +570,10 @@ iframe {
 
 .deleted-user-avatar {
   font-size: 36px;
+}
+
+.new-user a {
+  color: $dark_gray;
 }
 
 .staff a {

@@ -141,16 +141,13 @@ test("streamFilters", function() {
 
   deepEqual(postStream.get('streamFilters'), {}, "there are no postFilters by default");
   ok(postStream.get('hasNoFilters'), "there are no filters by default");
-  blank(postStream.get("filterDesc"), "there is no description of the filter");
 
   postStream.set('summary', true);
   deepEqual(postStream.get('streamFilters'), {filter: "summary"}, "postFilters contains the summary flag");
   ok(!postStream.get('hasNoFilters'), "now there are filters present");
-  present(postStream.get("filterDesc"), "there is a description of the filter");
 
   postStream.toggleParticipant(participant.username);
   deepEqual(postStream.get('streamFilters'), {
-    filter: "summary",
     username_filters: ['eviltrout']
   }, "streamFilters contains the username we filtered");
 });
@@ -206,14 +203,16 @@ test("previousWindow", function() {
 });
 
 test("storePost", function() {
-  var postStream = buildStream(1234);
+  var postStream = buildStream(1234),
+      post = Discourse.Post.create({id: 1, post_number: 100, raw: 'initial value'});
 
-  var post = Discourse.Post.create({id: 1, post_number: 1, raw: 'initial value'});
+  blank(postStream.get('topic.highest_post_number'), "it has no highest post number yet");
   var stored = postStream.storePost(post);
   equal(post, stored, "it returns the post it stored");
   equal(post.get('topic'), postStream.get('topic'), "it creates the topic reference properly");
+  equal(postStream.get('topic.highest_post_number'), 100, "it set the highest post number");
 
-  var dupePost = Discourse.Post.create({id: 1, post_number: 1, raw: 'updated value'});
+  var dupePost = Discourse.Post.create({id: 1, post_number: 100, raw: 'updated value'});
   var storedDupe = postStream.storePost(dupePost);
   equal(storedDupe, post, "it returns the previously stored post instead to avoid dupes");
   equal(storedDupe.get('raw'), 'updated value', 'it updates the previously stored post');
