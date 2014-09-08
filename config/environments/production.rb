@@ -24,6 +24,7 @@ Discourse::Application.configure do
 
   # Generate digests for assets URLs
   config.assets.digest = true
+  config.assets.prefix = '/discourse/assets'
 
   # Specifies the header that your server uses for sending files
   config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect' # for nginx
@@ -71,7 +72,13 @@ Discourse::Application.configure do
 
   # Discourse strongly recommend you use a CDN.
   # For origin pull cdns all you need to do is register an account and configure
-  config.action_controller.asset_host = GlobalSetting.cdn_url
+  #config.action_controller.asset_host = GlobalSetting.cdn_url
+
+  config.action_controller.asset_host = Proc.new do |source, request = nil|
+    scheme = request.try(:ssl?) ? "https" : "http"
+    "#{scheme}://cdn#{Digest::MD5.hexdigest(source).to_i(16) % 3}.railsenespanol.co.global.prod.fastly.net"
+    #"#{scheme}://#{ENV['S3_BUCKET']}.s3.amazonaws.com"
+  end
 
   # a comma delimited list of emails your devs have
   # developers have god like rights and may impersonate anyone in the system

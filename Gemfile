@@ -213,6 +213,7 @@ gem 'unicorn-worker-killer'
 gem 'newrelic_rpm'
 #gem 'honeybadger'
 gem 'rails_12factor'
+gem 'asset_sync'
 
 # required for feed importing and embedding
 gem 'ruby-readability', require: false

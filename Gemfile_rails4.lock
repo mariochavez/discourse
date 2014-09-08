@@ -47,6 +47,10 @@ GEM
       activerecord (>= 2.3.0)
       rake (>= 0.8.7)
     arel (4.0.1)
+    asset_sync (1.1.0)
+      activemodel
+      fog (>= 1.8.0)
+      unf
     atomic (1.1.14)
     barber (0.4.2)
       ember-source
@@ -398,6 +402,7 @@ DEPENDENCIES
   active_model_serializers
   airbrake (= 3.1.2)
   annotate
+  asset_sync
   barber
   better_errors
   binding_of_caller
