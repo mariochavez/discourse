@@ -51,7 +51,7 @@ Discourse::Application.configure do
   #     domain:               GlobalSetting.smtp_domain,
   #     user_name:            GlobalSetting.smtp_user_name,
   #     user_name:            GlobalSetting.smtp_password,
-      # authentication:       GlobalSetting.smtp_authentication,
+  # authentication:       GlobalSetting.smtp_authentication,
   #     enable_starttls_auto: GlobalSetting.smtp_enable_start_tls
   #   }
 
@@ -61,30 +61,49 @@ Discourse::Application.configure do
   #   config.action_mailer.sendmail_settings = {arguments: '-i'}
   # end
 
-  # Send deprecation notices to registered listeners
-  config.active_support.deprecation = :notify
+  config.cache_store = :dalli_store,
+    (ENV["MEMCACHIER_SERVERS"] || "").split(","),
+    {
+      username: ENV["MEMCACHIER_USERNAME"],
+      password: ENV["MEMCACHIER_PASSWORD"],
+      failover: true,
+      socket_timeout: 1.5,
+      socket_failure_delay: 0.2,
+      value_max_bytes: 10485760,
+      expires_in: 1.day
+    }
 
-  # this will cause all handlebars templates to be pre-compiles, making your page faster
-  config.handlebars.precompile = true
+    #config.action_dispatch.rack_cache = {
+    #  metastore: client,
+    #  entitystore: client
+    #}
 
-  # allows admins to use mini profiler
-  config.enable_mini_profiler = GlobalSetting.enable_mini_profiler
+    config.action_dispatch.rack_cache = nil
 
-  # Discourse strongly recommend you use a CDN.
-  # For origin pull cdns all you need to do is register an account and configure
-  #config.action_controller.asset_host = GlobalSetting.cdn_url
+    # Send deprecation notices to registered listeners
+    config.active_support.deprecation = :notify
 
-  config.action_controller.asset_host = Proc.new do |source, request = nil|
+    # this will cause all handlebars templates to be pre-compiles, making your page faster
+    config.handlebars.precompile = true
+
+    # allows admins to use mini profiler
+    config.enable_mini_profiler = GlobalSetting.enable_mini_profiler
+
+    # Discourse strongly recommend you use a CDN.
+    # For origin pull cdns all you need to do is register an account and configure
+    #config.action_controller.asset_host = GlobalSetting.cdn_url
+
+    config.action_controller.asset_host = Proc.new do |source, request = nil|
     scheme = request.try(:ssl?) ? "https" : "http"
     "#{scheme}://cdn#{Digest::MD5.hexdigest(source).to_i(16) % 3}.railsenespanol.co.global.prod.fastly.net"
     #"#{scheme}://#{ENV['S3_BUCKET']}.s3.amazonaws.com"
-  end
+    end
 
-  # a comma delimited list of emails your devs have
-  # developers have god like rights and may impersonate anyone in the system
-  # normal admins may only impersonate other moderators (not admins)
-  if emails = GlobalSetting.developer_emails
-    config.developer_emails = emails.split(",")
-  end
+    # a comma delimited list of emails your devs have
+    # developers have god like rights and may impersonate anyone in the system
+    # normal admins may only impersonate other moderators (not admins)
+    if emails = GlobalSetting.developer_emails
+      config.developer_emails = emails.split(",")
+    end
 
 end
