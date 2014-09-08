@@ -71,10 +71,10 @@ module Discourse
 
     # Activate observers that should always be running.
     config.active_record.observers = [
-        :user_email_observer,
-        :user_action_observer,
-        :post_alert_observer,
-        :search_observer
+      :user_email_observer,
+      :user_action_observer,
+      :post_alert_observer,
+      :search_observer
     ]
 
     # Set Time.zone default to the specified zone and make Active Record auto-convert to this zone.
@@ -89,13 +89,13 @@ module Discourse
 
     # Configure sensitive parameters which will be filtered from the log file.
     config.filter_parameters += [
-        :password,
-        :pop3s_polling_password,
-        :s3_secret_access_key,
-        :twitter_consumer_secret,
-        :facebook_app_secret,
-        :github_client_secret,
-        :discourse_org_access_key,
+      :password,
+      :pop3s_polling_password,
+      :s3_secret_access_key,
+      :twitter_consumer_secret,
+      :facebook_app_secret,
+      :github_client_secret,
+      :discourse_org_access_key,
     ]
 
     # Enable the asset pipeline
@@ -131,7 +131,23 @@ module Discourse
 
     require 'discourse_redis'
     # Use redis for our cache
-    config.cache_store = DiscourseRedis.new_redis_store
+    # config.cache_store = DiscourseRedis.new_redis_store
+    config.cache_store = :dalli_store
+    client = Dalli::Client.new(
+      (ENV["MEMCACHIER_SERVERS"] || "").split(","),
+      username: ENV["MEMCACHIER_USERNAME"],
+      password: ENV["MEMCACHIER_PASSWORD"],
+      failover: true,
+      socket_timeout: 1.5,
+      socket_failure_delay: 0.2,
+      value_max_bytes: 10485760,
+      expires_in: 1.day
+    )
+
+    config.action_dispatch.rack_cache = {
+      metastore: client,
+      entitystore: client
+    }
 
     # we configure rack cache on demand in an initializer
     # our setup does not use rack cache and instead defers to nginx

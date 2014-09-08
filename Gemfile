@@ -212,6 +212,7 @@ gem 'rbtrace', require: false, platform: :mri
 gem 'unicorn-worker-killer'
 gem 'newrelic_rpm'
 #gem 'honeybadger'
+gem 'rails_12factor'
 
 # required for feed importing and embedding
 gem 'ruby-readability', require: false
