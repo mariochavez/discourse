@@ -36,7 +36,7 @@ before_fork do |server, worker|
     puts 'Unicorn master intercepting TERM and sending myself QUIT instead'
     Process.kill 'QUIT', Process.pid
   end
-  
+
   ActiveRecord::Base.connection.disconnect!
   $redis.client.disconnect
 
@@ -75,6 +75,6 @@ after_fork do |server, worker|
   end
   ActiveRecord::Base.establish_connection
   $redis.client.reconnect
-  Rails.cache.reconnect
+  #Rails.cache.reconnect
   MessageBus.after_fork
 end
