@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-ruby '2.0.0'
+ruby '2.1.2'
 
 # monkey patching to support dual booting
 module Bundler::SharedHelpers
@@ -211,7 +211,7 @@ gem 'rbtrace', require: false, platform: :mri
 # Heroku (but useful anywhere) stuff
 gem 'unicorn-worker-killer'
 gem 'newrelic_rpm'
-gem 'honeybadger'
+#gem 'honeybadger'
 
 # required for feed importing and embedding
 gem 'ruby-readability', require: false
