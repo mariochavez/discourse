@@ -1,3 +1,5 @@
+Note: Fork from [Heroku](https://github.com/rwdaigle/discourse)
+
 Note: This is a fork of Discourse specifically for [deploying to Heroku](docs/HEROKU.md).
 
 <a href="http://www.discourse.org/">![Logo](images/discourse.png)</a>
